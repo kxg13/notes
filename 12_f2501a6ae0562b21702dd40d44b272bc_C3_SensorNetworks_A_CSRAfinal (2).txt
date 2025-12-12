@@ -1,0 +1,422 @@
+[MUSIC]. Hi, there. In this lecture, we're going to
+see a little bit about, sensors, which have emerged in the last decade or so, and wireless networks,
+that might be joining them. What do I mean by a sensor? This is an example of a sensor I have
+here, which was originally, fabricated, by researchers at Berkeley. Then, later on made by
+a company called Crossbow, which is later on being,
+acquired by another company, Moog. I'll tell you a little bit more
+about these kinds of sensors, why they have emerged,
+and so on and so forth. But let's start at a much more,
+broader or, higher level. So, everything is getting smaller or,
+all around us. In fact, the smallest state-of-the-art
+transistor that is being made today, is can be made from a single gold atom. Of course, this is still in research,
+not yet in industry. But just imagine a world
+where you could make a, a transistor of just one gold atom. And let's do some calculations just for
+fun. Pentium P4,
+which is a fairly old processor by Intel, contains about 42 million transistors. The atomic weight of
+gold is about 196 to 200, depending on which isotope you look at. 1 gram of gold contains, 3 times 10 to,
+10 the 21 atoms, which means that, if you use all the atoms correctly to
+make one pros, one transistor each, then you can make, 7.5 times 10 to the 18
+Pentium 4 processors for one gram of gold. Which means that from 1 gram of gold,
+you have enough processors, Pentium 4 processors, to, give each person in
+the world a billion Pentium 4 processors. That's with just 1 gram of gold, okay. So, you can imagine that as these, what
+are known as form factors get smaller and smaller, as the sizes get smaller, you can
+make many more of these, sensor nodes. Many more of these processors. In general, the speed of the CPU is,
+greatly proportional to the square root of the transistors that
+you can put on the dye. So, we are not talking very far from
+reality with these ballpark calculations, but of course, we are pretty far, from,
+this reality because after all you still cannot make, in a production,
+a transistor from 1 gold atom. But essentially, the point I am trying to make here is
+that everything is getting smaller. And it's easier and
+easier to make, smaller computers, such as, this one over here. [SOUND] So, sensors have been around for
+a long time. Coal mines have used, and
+all kinds of mines have used, sensors for carbon monoxide and carbon dioxide. In the old days,
+when we did not have technology, these, sensors used to be birds in cages. This is where, canary in a coal mine,
+the phrase comes from. Essentially, if the bird died,
+you knew that something was wrong, that the level of carbon monoxide in the
+mine might be too high and it was time for the miners to get out. Today of course,
+many mines in the world, not all, but many mines use,
+advanced technology sensors. Industry has used sensors for
+a long time, for instance, on the assembly line where cars are being
+manufactured one step at a time, you need to use sensors so that
+the assembly line is moving all the time. Today, however,
+we deal with excessive information and we need to process this information
+data and convert it into knowledge. For instance, environmentalists might want to collect
+data on an island which is uninhabited. Where there are no people and where,
+the terrain may be inhospitable. Armies might want to collect data
+in the battlefield, without, putting the lives of the soldiers at risk. And in general, humans, want to collect their data from
+across a wide geographical area. For instance, they're on the volcano, where they might to measure earthquake
+movement, volcanic movement, and, predict the movement of
+the volcano's base on the sensors. You really don't want to have people
+over there, monkeying around, when a volcano might erupt
+at any point in time. And this is where sensor networking
+technology comes into place. Where you might deep lie, say a few
+hundred of these around the volcano and, then, detect, acoustic movements, which might, hint at the volcano
+erupting in the near future. So, the growth of any technology, such as
+in sen, in sensor networking technology. But in reality, any technology
+requires three components in there. It needs hardware, good hardware. It needs good operating systems and
+distributive protocols, especially when you have, the hundreds of
+these sensors networked with each other. And of course, you need applications. We won't talk much about the applications. Let me just say that. There are both military applications,
+for these sensor networks, as well as civilian applications,
+such as the environmental observation, as well as the, case of,
+monitoring volcanoes. So, these sensor networks
+have been deployed in cases, where you want to monitor,
+the movement of whales in the ocean, where each whale has been fitted out with
+a sensor, where you want to monitor the, temperature and humidity in a forest,
+in, in, in an island, and for instance, the Great Duck Island, which is one of the islands that
+has a very interesting ecosystem. It was outfitted with sensors
+to measure the temperature and humidity inside the forest. And then, of course the volcanoes in,
+South America have been outfitted with, sensor networks to measure their activity. So, let's discuss the other two. The sensor nodes themselves have emerged,
+because of several trends. First of all, there is, Moore's Law
+which says that, in general Moore's Law, has said that, the processing capacity,
+doubles every 80 months. Nowadays, this processing capacity stands
+more for, the number of processors you can put per dye and less for
+the CPU speed, but in general, over the last, few decades, Moore's Law
+has made processors faster and faster. Wireless communications also advanced,
+and then finally, you have MEMS, which is known as
+micro electro mechanical sensors. Where essentially, you have sensors
+that convert some form of energy into electrical, into an electrical impulse,
+which can then be sent to a processor, so that the processor can then process it. And that's essentially what's going on
+with, these sensor boards over here. So, you have this, board,
+which has, the processor over here, you can see it's a 900 MHz processor here. And then,
+it has a little bit of memory on it. I see a little about, how its memory,
+it has in a little bit, but what you do is attach this sensor bolt,
+which has a bunch of sensors on it. So, this has an acoustic sensor, a sound
+box, thermometer, and a few other sensors. And, you attach it on
+top of this essentially. [SOUND] Let me make sure I'm
+getting this the right way here. And voila, you have a working sensor. A sensor board, where the sensors on
+this top board, can convert some form of energy, for instance, the, the microphone
+on this would be able to convert sound energy into electrical impulse,
+which is then sent over to the processor. Which is also on the board over here,
+which can then process it accordingly, according to the application
+that you've written. Second, it needs a microprocessor
+as you've seen here. Third, it needs a communication link and in this case you have
+this wireless antennae. So, this is a,
+this is the wireless communication link. So, that this sensor, mote can then
+talk with other sensor motes out there. And they can network together
+in a wireless, network. And finally, you need a power source. because these are likely to be
+deployed in, the, in terrains where, it may not be possible for
+humans to go out there and recharge them. And, of course, it may not be possible to, power them using just regular
+AC electricity off the wall. You need batteries. And this has, this particular model
+has two AA batteries, running on it. So, the sizes of these
+motes are very small. This mote that I've shown
+you is called a MICA mote. Or a MICA mote. And then, there are smaller
+models of a MicaDot mote, which is also manufactured by the same company
+is, smaller, it's also running the same. CPU 900 megahertz and it has,
+as you can notice, a wireless antennae. Intel Motes were manufactured by Intel
+subsequently here is an example of an Intel Mote for you, and
+Intel Mote typically has an arm processor. Here I have, the Intel Mote has two
+pieces, the sensor board is on top. This is sensor board over here, and
+then the other board is in the bottom. And you can see it says
+Intel Research over here. And of course, it has batteries. In this case, they are lithium batteries,
+running over here. ' Kay and there is an on button here, you
+switch it on and after a while, well you can see that it starts blinking over here,
+which means that well now it's active. It went from white to blue and
+it means that it's now active. K, switch that off. And then there are other sensor,
+motes like this which have been created that are even smaller,
+for instance Golem Dust, which is one of the sensor motes that
+is created by Oxboro by Cross-bo, had a volume of only a few cubic
+millimeter, which is really, really small. It's much smaller than a typical
+penny coin that you might find. In any case, in all these sensors
+everything is on one chip. So you know, you notice that when you
+have sens, this processing board and this sensing board everything
+is on just one chip. You know, there is no other
+peripherals you can attach to this. There is no disk over here. There is no monitor over here, there is
+no mouse, there is no keyboard to this. Everything is on one chip. So this consists of the processor the
+transceiver, which is a fancy word to say transporter receiver,
+essentially this is the wireless antenna. The battery the sensors,
+and also the of memory and of course buses to connect
+the memory with the processors. These are very wimpy machines. The MICA mote, for instance,
+has a 4 megahertz processor. It's got a wireless bandwidth of
+about 40 kilobytes per second. It's got only 4 kilobytes of RAM, so
+that's the amount of RAM you have. Not 4 megabytes, not 4 gigabytes,
+which you might find on your. Workstations today, but
+just for kilobytes. This is really, really puny. This is very tiny. It has 512 kilobytes of serial flash. But essentially, you need to fit almost everything in
+the program on four kilobytes of RAM. If you let it run for on full blast
+on the batteries, then it lasts for only seven days,
+which means that it's very important. For programs if you like to conserve
+the energy, to conserve the battery. You don't want to be running
+at full blast all the time. You want to potentially go to
+sleep at some point of time. So that the sensor net,
+node can save its energy for later on. So there are many different kinds
+of sensors that are available, you could have acceleration sensors,
+vibration sensors which might be useful on the battlefield to detect tanks sound
+sensors, gyroscope sensors tilt, magnetic, motion, pressure,
+temperature of course. A light humidity moisture barometric,
+but ideal can be outfitted and in fact these sensor boards can be daisy
+chain on top of each other, so you can take one and put it on top of this and
+then you can stack them on as you desire. Other requirements for instance,
+in some of the metros and some of the larger cities in
+the world have used chemical sensors, such as carbon monoxide,
+carbon dioxide, and radon sensors. As well as biological sensors,
+which detect pathogens. In some cases, actuators are used
+to these involved mirrors, motors, smart surfaces, and micro-robots. So when you have sensors in the same boat
+as a processor, how do you connect them? Well typically, on these voltages the bus
+has to be a low-power and fast bus. And the bus using these is called an,
+an, called the I to C bus, or the Inter-I-C connect bus. This is developed by Phillips. This connects the sensors
+to the microprocessors. It's very simply. It has only two wires. Whether the wires are bidirectional. One of them is for data. It's called a serial data bus. The other one is for the clock
+which is called a serial clock bus. The serial clock bus is typically used
+to make sure that the sensors and the processors are talking
+at the same speed, so that they can send data to each
+other over the serial data bus. Even though this has only two wires,
+it has a fairly high bandwidth, 3.4 megabits per second which is high
+enough for a computer as puny as this. What about the transmission medium? Well on, in all of these cases whether
+it's a MICA whether it's the MICA dot or whether it's the. The communication medium is radio
+frequency which is a typical communication medium that for instance your cellphone or your laptop users when it
+talks to a bay station. Essentially, you're sending RF
+waves out over the wireless medium. This is a broadcast medium which means
+that when one sensor is talking to another, the second sensor needs to
+receive the packet from the first sensor store it, process it, and
+then forward it to the next sensor. Links are typically bidirectional
+which means that when Sensor A can hear Sensor B, it's also
+true that Sensor B can hear Sensor A. What do I mean by broadcast? This means that when a sensor transmits,
+any sensor within hearing range, no matter which direction it is
+in can receive its transmission. When you go smaller, when the, when you're talking about Smart Dust which
+is a really small smaller than a penny. Sensor node. RF is not necessarily attractive
+because it has high frequency and it consumes a lot of power. And in those smaller form factors,
+you really don't have enough battery saved up in your battery
+to support RF communication. Instead you want to support
+optical transmission. Some of these smaller motors
+support optical transmission. This involves simpler hardware and
+it consumes lower power. However it comes with a few challenges. Here optical transmission essentially
+means that you have a laser, right? You have one sensor its packets
+via laser to another sensor and this means that you don't have
+a broadcast medium anymore. You have a direction and you need to make sure that the laser
+is pointed at the receiving sensor. Broadcasts can be expensive, you can't necessarily send out a packet to
+all of the sensors in your hearing range, you need to direct it to every sensor
+that you want to send a packet to. Line of sight is required. Laser cannot go through walls. So you need to make sure that
+the receiving sensor is within viewing distance of the sending sensor. In some cases you may need
+to move antennas around because if you want to direct the laser
+accurately the receiving sensor, this involves mechanical antenna movements
+that might use up a bit of energy. So switching links might be costly. However one of the advantages is that
+you can use emitters to go out on one. So you can use an intermediate sensor
+which simply reflects your being. This is known as wormhole routing, where
+the intermediate sensor is not storing and forwarding packets,
+like R-F communication. But instead, instead is simply
+routing the packet as is via a mirror. So this is fairly fast. Finally, the links are unidirectional. So sensor a will be able to send to
+sensor b doesn't mean that sensor b is laser beam optical transmission. As directly I can say is maybe
+do that at somewhere else. So to summarize the sensor node
+discussion, the size of these sensor nodes are very small,
+just a few millimeters to a few inches. The have limited processing and
+communication. They're very puny, just a few megahertz
+of clock, just a few megabytes of flash, just a few kilobytes of RAM. And a few tens of kilobytes of,
+kilobytes per second of wireless. In some cases,
+a few hundreds of kilobytes per second. They have limited power. They are typically
+running on batteries and you cannot recharge those batteries
+in inhospitable terrains. So you need to be sure that you can
+conserve, energy when you write code for these sensor nodes. They are also failure prone and
+bodies nodes are failure prone, as well as links are failure prone. So, you know,
+if you deploy this in the battlefield a tank might run over it and destroy it. If you deploy it in the forest an animal
+might come and destroy it or just eat it. Also the links are failure prone, so, you know, if you send out
+a packet over the wireless medium, it might get dropped because there
+is noise in the wireless medium. But, of course, they're easy to
+manufacture and deploy in large numbers. And so, you need to offset this with,
+protocols, just protocols and operating system design that are scalable,
+that's scaled a very large numbers of these sensor nodes
+talking with each other. And also there are fault order that work,
+when the protocols work in spite of the fact some of these
+sensor nodes might fail. So, what about the operating system? What operating system do
+sensor nodes like this, run? Well, there's a few,
+considerations here when you want to, run, when you want to build
+an operating system. First, you want your operating system
+to be small because you only have a few kilobytes of RAM,
+4 kilobytes of RAM on the MICA mote. You need your operating system to,
+compact and fit in memory, very compactly. Embedded operating systems, which run on,
+you know, intelligent washing machines and intelligent, microwaves, for instance,
+are not applicable because they use several hundreds of kilobytes of,
+read-only memory or hundreds of kilobytes of, memory, and
+they won't fit on the sensor mode. You need to worry about what your
+work load characteristics are for these sensors nodes, typically the work
+load characteristics are bursty. Typically, the sensor motes are not doing
+anything until something interesting happens in the neighborhood. For instance, there is,
+a tank movement or, there is some rumbling on
+the surface of the volcano. You want to use,
+reuse these sense, sensor nodes, you don't want to build a sensor mote that
+is specifically built for the volcano. You want to reuse the same, board, for
+the enemy battle tank, deployment as well. And finally,
+you need to worry about scheduling and real time, characteristics where you
+want to process things very quickly. Of course, you want to make sure that
+these sensors don't consume much power and that the communication is also optimized. So, all of these requirements were,
+summarized by researchers at Berkeley who built the operating system known
+as the TinyOS operating system for these small devices. So, the MICA mote over here is
+running TinyOS operating system. The MicaDot is running the TinyOS
+operating system too, and, many versions of the Intel mote are also running,
+obedient of the TinyOS operating system. So, the fact that you need bursty data for
+different computations, the fact that you want to support multiple data
+streams, the fact that you want real-time computations and power conservation, and
+as we've discussed on the last slide. All of these led to TinyOS being an
+event-driven execution, a reactive mote. So, unlike your, workstation and
+laptop which are always running something, some process all the time, these, motes
+might actually go to sleep when there's nothing interesting going
+on in the neighborhood. When something interesting happens,
+these motes then react and then might, might undertake some computation in
+order to react to that, stimulus. Also you want your OS to be small,
+operating system to be small and you want to accommodate a diverse
+set of applications and these led the researchers,
+to build a modular operating system with modular structure and components with
+clean interfaces between these components. So, in order to program these
+TinyOS Motes, yes you can program these. You use a, language called NesC,
+which stands for 'nest at C'. It's a variant of C, so, if you're familiar with C or
+C++, NesC should be fairly easy. NesC defines components, and a component
+can be either a module or a configuration. A module, specifies a set of methods and
+some internal storage. This is sort of like a Java class. Essentially it is a Java class with it's
+own internal storage, a few fields, and a few methods to access those fields. But it's a static Java class, and,
+why do you want a static Java class, because you have limited memory, you don't really want dynamic memory
+allocation on these, small devices. You could write a module that
+corresponds to hardware element. This would be sort of like
+the device driver for that element. For instance for the clock or for the LED,
+or, it will use a defined software module, for instance, for the routing protocol among the sensors,
+that are connected in the network. Module is implemented using interfaces. This is just like, you know,
+your regular Java classes, so that, other modules can then
+call the methods in this module. So, now, you can wire these modules
+together by having one module call method, methods in other module, and these are,
+this together is called a configuration. It's a program that you write where you
+have multiple modules that are talking with each other by calling each
+other's methods that will be called a configuration. A complete NesC application consists
+of one configuration where you have multiple modules and
+they're talking with each other. So, component invocation is event driven, which means that, components don't,
+start executing just by themselves. They start executing only when
+they're invoked by some other event. So, for instance, when something
+interesting happens in the neighborhood, when, the, when there is a vibration for instance, the, acoustic sensor,
+might come into play. That particular module that runs
+the acoustic sensor might run. It might then call, the routing module
+which will then transfer the packet over to another sensor mote. You have static allocation here only here
+you typically you don't have dynamic allocation because you don't want to have,
+run-time overhead being incurred, when, you have only limited
+amounts of memory available. You can also do real-time scheduling, both hard real-time scheduling
+where you have deadlines for tasks, as well as soft real-time scheduling
+where you have soft deadlines for tasks. And finally, you have explicit
+interfaces by these modules so that you can accommodate
+different applications. A routing module that you write for,
+the volcanic deployment, could be reused in the, in the enemy
+battle tank deployment scenario, as well. Once you've written your application, and
+this discussion applies to the MICA Mote over here, you will write your
+application on your laptop or workstation, let's say that's your PC. It could be a NesC program. You will compile it to an executable,
+for the mote. You will then simulate it and
+debug it, on your PC itself, on your, workstation, laptop, whatever. But without, but
+before deploying it on the mote itself. It's easier to simulate it on your
+workstation and easy to debug it there. TinyOS typically comes mounted with
+a TinyOS simulator known as TOSSIM, which allows you to simulate, hundreds of
+sensor motes talking with each other and executing your program so that you can
+now debug your application very easily. Then, typically, for the MICA mote, you plug your mote into,
+the port on your machine. So, you know, you plug your mote in here
+and this would go into your machine and you download the program onto the mote and then, it's running your
+program when you switch it on. Some of the newer versions of motes allow
+you to download the program wireless over the wireless link
+onto the mote itself. And when you turn on your mote,
+it is running your application. Most of these motes run only one
+application at a time, but you can modify the Tiny OS operating system to support,
+multiple applications running as well. So, what about energy savings? So, these have very limited,
+a battery supply, and they're typically running in terrain, in, in scenarios
+where it's difficult to recharge them. So, these motes, like the MICA motes,
+come with multiple power saving motes. They could either be active,
+idle, or sleep. Sleep means, you know, typically,
+the MICA mote is asleep, it might wake up after a while or it might
+wake up when, one of the sensors goes on. Active means that the MICA mote is
+sending and receiving messages. Idle means that it is alive. It's awake but it's not necessarily
+doing anything interesting. It may be computing something but
+it's not sending and receiving messages. Now, there's a tremendous variance
+in energy supply and demand. You could use batteries,
+you could use solar cells. You could use vibration to power your
+batteries and recharge your batteries. And in some cases,
+if you're deploying the sensor motes, some of these sensor motes in a building
+or in a bridge, you might actually be able to use, power, off the wall, off the AC
+socket of the wall to charge these. So, you don't need necessarily need to
+worry about recharging the batteries or replacing the batteries. In essence, you need to worry about, sources when you think about what
+your deployment requirements are. If you have a long term
+deployment requirement, while you're deploying these in
+inhospitable terrains then, eh, yeah, you want to make sure that
+you are conserving power. So, short term deployment, then,
+you could worry less about, about power. Also, how much bandwidth is being used
+by application is another thing that you need to worry about. Some numbers here from,
+the two AA batteries being used, this consumes 200 microamps
+of average current. This will not mean much in this particular
+scenario, but it's an interesting fact. So, the TinyOS, itself is a fairly small,
+operating system. The software footprint
+is just 3.4 kilobytes, which fits just about perfectly
+on the 4 kilobytes of RAM. That is there on these Mica modes. But this also means that you
+can't really load a lot of data. You need to process data rather
+than just store data on there. Power saving modes as we've discussed
+are active, idle, and sleep. Although of all of the capabilities on
+this Mica mode the radio transmission is the most expensive it
+consumes the most power. It consumes 12 milliamps of power. The second, highest, consuming, power consuming capability is a CPU
+being active that is consuming, that is computing actively, which
+consumes only 4.6 milliamps of power. This essentially means that your,
+when you have a program, for these mi for these Mica modes. You, you may want to prefer computation
+over transmission of data so it's much better for you to compute
+something, compute an average and then send over the average rather
+than send over the raw data itself. And this has led to many in-network
+aggregation approaches being used for sensor networks but these sensors are taking to each
+other over the wireless network. Essentially in these network aggregation
+approaches you would build trees among the sensor nodes, with the base
+station at the root of the tree. And internal nodes would receive
+values from their children, would compute an average of these values,
+or some other summary. And then transmit,
+these values up to their parent. And finally the base station which
+is at the root of the tree gets, the summary value the final average value. This is far more efficient
+than either sending, the raw values over to the base station. All communicating directly with the base
+station which involves far more power because they're sending
+over much longer distances. It also allows the base station to be
+fairly far from, the center of action. For instance, you don't want the base
+station to be near the volcano, you want it to be far away. So this is also the correct, sensor nodes
+also have the correct direction for the future technology because today's
+growth rates are that the data, the size of the data is growing
+much faster than the than the cost effectiveness of storage. Which in turn is growing much
+faster than the speed of CPU. Which in turn is growing much faster
+than the speed of communication. Growth which in turn is growing
+much faster than the battery. So the energy stores,
+the batteries themselves, are growing at the smallest rate. Due to hostile environments
+whether they're battlefields or they're environmental scenarios
+as well as the cheap fabrication, you could have higher failure
+rates in sensor nodes. And so you need these sensor networks,
+to be self-organizing, you need them to be self-managing,
+you need them to be self-healing. When a failure occurs, you want
+the sensor networks themselves, to, figure out new paths to,
+send the data to the base station. And finally you want, these,
+distributed protocols to be scalable. You want the number of messages to scale
+well as the number of sensors, grows. So if the number of sensors doubles and
+your, you know the number of messages goes up by
+a quadratic goes up by a factor of four, that's not a good, scalable protocol. You want it to be growing up, linearly, if possible sub linearly,
+as the size of the network grows. In general related to this direction
+of sensor nodes are a couple of other directions that have also emerged,
+recently. ASICs known as Application-Specific
+Integrated Chips are chips that are built for specific applications and
+those can be used on the sensor nodes. FPGAs are Field Programmable Gate Arrays
+where you can actually program the hardware itself for a specific application have also
+emerged in the last few years. These are of course much faster because
+you are moving a lot of capability and functionality into the hardware and anything you can put into hardware is
+much faster than doing it in software. Sensor nodes are cheap and
+battery limited, you can deploy them in inhospitable
+terrains whether they're deployments or on, on the periphery of a volcano or in
+an island to monitor, heat and humidity. But you need to conserve power because
+it's difficult to recharge these sensor nodes, frequently. So you need to be smart about
+the design of the operating system and the TinyOS operating system has
+been built exactly for this. And you also need to build distributed
+protocols, very very well. We've discussed the design of TinyOS and
+a few challenges where it comes to designing distributed protocols for
+these scenarios. Related to this discussion are, are a few
+other topics that you can look up, the Raspberry PI and Arduino platforms
+that have emerged in the last few years which allow you to program small
+manageable computers very easily. And you might want to look these up these are very interesting
+topics if you have not heard about them. Home automation systems use a lot of
+sensors these include companies such Nest, AMX, Homelogic, Honeywell, etc. Typically these are sensors that
+control the temperature in your home or control the locks, in your home. The power concerns are smaller because
+they're typically connected to easy power but you have security and
+accuracy concerns here. You want your,
+home automated assistance to be accurate. To let you in the door, to set the correct
+temperature when you so desire. Typically it's possible to network these
+devices together in your home these are known as internet of things. That's a, key phrase you will hear,
+essentially this means that you're, eh, you're networking many devices,
+many of these, sensors together, into a network and you are then managing
+them together over the network. Often these are known as Cyberphysical
+systems when you have human beings involved along with sensors and devices networked with each other,
+these are known as Cyberphysical systems. Cars and vehicles today for instance have
+become networks have become networks of sensors where you have sensors at
+the tires monitoring the pressure. You have sensors in the engine
+monitoring the status of the engine and all these are talking with each other. And I've been reading the alerts to you
+on your dashboard when you're driving. These combinations of humans and machines
+are often called cyberphysical systems and these are becoming more and
+more wide spread. For instance in operation
+theaters in hospitals, doctors are increasingly
+using machines around them. To make sure that there is more accuracy
+and in the operations itself and that the doctors being assist are being
+assisted as much as possible. [MUSIC]

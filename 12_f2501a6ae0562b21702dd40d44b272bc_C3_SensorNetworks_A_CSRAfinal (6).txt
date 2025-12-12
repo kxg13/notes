@@ -1,0 +1,186 @@
+[MUSIC] So after having seen what a vanilla
+distributed file system looks like we are going to see a couple
+of real file systems. The NFS file system and AFS file system. These are very popular and
+continue to be used even today. First then, our first file system
+it's the Network File System. It was developed by
+Sun Microsystems in the 1980s and it continues to be used widely today. Both in clusters, data centers,
+as well as in smaller scale clusters. So here is what NFS
+architecture looks like. And then you know, I'll, I'll displayed out in more
+detail over the next two slides. So you have the server machine, of course. And, you have multiple client machines. On the client machines, there might be multiple processes
+that are trying to access the files. The processes execute operations with what
+is known as a virtual file system module. You'll notice that there is a virtual file
+system module also on the server side. Over here, on the right. When a process makes a call to
+the virtual file system module. It then decides depending on whether
+the file is local or remote. Whether to relay the call to
+the local Unix File system or to the NSF Client system. If the file is local,
+then the Unix File system is accessed. And that in turns accesses the local disk. And then returns the information
+directly to the process. However the file is remote if
+it is located on the server, then the NFS Client system forwards
+the request to the NFS Server system. This is done via typically an RPC. And then the NFS Server system forwards
+the request to the virtual file system on the server side. Which then forwards it to the Unix
+file system on the server side. Because after all on the server,
+the file is stored on local disk and the file is then accessed
+from the local disk. Then, the information about the file, such as a blog being read is done on
+the reverse path shown by these arrows. So you'll notice a few components here. The NFS Client system, the NFS Server
+system, and the Virtual File System. Let's s, go into a little bit more detail. The NFS Client system is similar to our
+Client service that we discussed in the vanilla distributed file system. Here it is integrated with the kernel,
+that is with the OS, so it executes in the,
+with kernel level privileges. Okay. It performs RPCs to the NFS Server
+system whenever distributed file system operations are involved. The NFS Server system pays the role
+of both the Flat file service and the Directory service from
+Vanilla Directory file system. Which we discussed in
+the previous lecture. NFS allows mounting of files and
+directories. This means that clients can mount a remote
+directories to a local directory name. For instance,
+if you mount a /user/edison/inventions into a local directory
+/user/tesla/my_competitors. Now user/tesla/my competitors/foo actually refers to user/edison/inventions/foo. Okay? So mounting doesn't copy files over. Instead it just creates a pointer
+to the original directory so that now you may use a pseudonym. A, a clone name to refer to those files. It makes it convenient for users as well
+as processes to refer name files name, directories, and
+access files and directories. What about the virtual file system module,
+which is present in more, the client side than the server side? That's the third module
+we saw on that figure. The virtual file system module
+allows processes to access files via file descriptors. Well, this is, this should kind of,
+surprise you at the beginning. Because we discussed in the vanilla
+distributed file system that vanilla distributed file system
+does not use file descriptors. Primarily because our item
+portance requirements. However, you want to use file descriptors
+because you want to have transparency. You want processes to be able to access
+local and remote files while the same API. And since local files are accessed
+using file descriptors, you want to support the same for
+remote files as well. That's what is supported by
+the virtual file system modules. Okay.
+So as far as client processes are concerned, they access local and remote files via
+the same API using file descriptors. But when an access is received by
+the vir-, virtual file system module, or the VFS module. It decides whether to route it
+to the local file system or to the NFS Client system. And here is where the translation
+from file descriptors to the item item portent operations happens. Okay? So all the files, local or
+remote, are named uniquely, using NFS file handles by
+the virtual file system module. The virtual file system keeps the data
+structure for each mounted file system. It also keeps a data structure for
+each file it opens. This is called a v-node data structure. Okay.
+Here's where the translation happens. If the file is local, that is,
+stored locally on the client machine, then the v-node points to the local
+disk address, called the i-node block. However, if the file is remote, then the v-node contains the address
+of the remote NFS server. So that RPC's can now be sent to that NFS
+server to obtain blocks of that file. Okay so here is where, this data section, the v-node data structure maintained
+by the virtual file system module. Is the one that does
+the translation between the stateful non-item
+portent file descriptors. And the stateless behavior item
+portent operations that we really desire from
+the distributed file system. Now, NFS uses server optimizations and these are the main reasons why,
+optimi, why NFS is a fast system. Server caching is one
+of those optimizations. It's useful for doing, reads. Essentially on the server side,
+you store in memory, in RAM, some of the recently accessed
+blocks of files and directories. ' Kay, now this might be blocked access
+by a different kind of processes, different machines but why does this work? Well this works because most programs
+written by humans tend to have what is known as locality of access. Locality of access essentially
+says that if a program or a process has accessed
+a block in the recent past. It's going to be, it's likely going to
+be accessed in the near future again. This means that if you
+store that block in memory you can then access those near future
+accesses to that, to that block. And be done very very quickly. Instead of going to disk you simply
+access the block from memory itself. Then when you do a write at the server. Then, our write is received at the server. There are two flavors in
+which this can be done. The first is known as a delay write. The second is a write-through. In delayed write flavor, you write
+you do that write only in memory. You don't write or list immediately. Instead periodically, say every
+30 seconds, you flush it to disk. Okay? This is done, for instance,
+via Unix sync, sync operation. This is fast because the write can, write can be now undone in memory fairly
+quickly, but it may not be consistent. Why is it not consistent? Well, if you, if you, if the server
+crashes before it does the next sync. Then any of the writes
+that are put in memory, but not yet
+flushed to disk might in fact be lost. If you want to be really consistent,
+you should use write-through. Write-through whenever a client
+write is received at the server is essentially,
+write is done immediately to disk. Before ack is sent to the client. This ensures the best consistency that all
+the rights are in fact are done durably on the server side. But it may be slow because it
+involves disk seek and a disk write. What about on the client side? Well on the client side
+too you can do caching. So you don't you, you don't need to block,
+cache blocks only on the server side. Clients can also cache because your
+locality of access it also true for each process. So, a client caches
+the recently accessed blocks. Each block that is present in the cache
+on the client side is tagged. With the time at which the cache entry
+was last validated, known as Tc. And also, Tm, the time at which the block
+was last modified at the server. A cache entry, at a given time,
+T, is said to be valid, if the difference between T and
+Tc is less than a small, value of small t. Or, if, the, time at which the,
+block was last modified at the server is the same as,
+the time stamp that is made at the client. 'Kay.
+So, in the second donation is true. Essentially, you're saying that
+a copy of the the file or the block. And the client has the same as
+the copy of the block and the server. But, doing this second operation
+requires you to do an RPC to the server. Which maybe expensive and
+it may involve somewhat of latency. To award that RPC, you give some amount of
+elasticity to the block you are restoring. And say that hey,
+the block is less than small t old, I'm going to still consider
+that block as being fresh. 'Kay, so
+T is known as the freshness interval. This is a compromise between
+consistency and efficiency. If the value of T is very, very small,
+essentially, say T is zero for instance, then essentially it means
+that you will never do this check. You would always go and
+query the server for its time stamp. Okay, so that's the most consistent
+system, but it may be fairly slow. If the value of T, small T is large
+it means that you are willing to tolerate some amount of staleness for
+fast accesses. Typically this value of T is set to be set
+adaptively by a system like Sun Solaris. Sets T adaptively between
+3 to 30 seconds for files. And between 30 to 60 seconds for
+directories. When on the client side,
+when a block is written by the process, you do a delayed write to server. Because after all,
+if you have a non zero value for small t,
+you're going to have stale blocks anyways. So you might as well do a delayed write
+which is a more efficient form of doing the write. So that was NFS,
+now let's quickly discuss AFS. We won't discuss all
+the design details of AFS, we'll discuss a few design details
+that are kind of interesting. So the name Andrew in
+Andrew File System name comes from the Andrew in Andrew Carnegie and
+Andrew Mellon. Who are the cofounders of
+the Carnegie Mellon University. And is not, should be a surprise to you
+that AFS was in fact designed at CMU. Which is how its name came about to be. It's used in many clusters today,
+especially in University labs. So, AFS involves two very interesting
+design decisions whole file serving and whole file caching. So, earlier when we discusses NFS, we were talking about block being cached
+on the server side and on the client side. AFS is not dealing with blocks on the
+file, instead it deals with entire files. When a client accesses or opens a file. It is given the entire file. Not just the opening block of the file. Also when a client caches a file,
+it caches the entire file. It doesn't cache just
+a few blocks of the file. Okay so everything is done on the file level basis
+rather than on the block level basis. Also on the client size the cache is
+permanent being that it is stored on disk. And so even if the client crashes, it can
+then recover and then access its cache. Why is whole file serving
+a good alternative? Well you might think that files that are
+very large, gigabytes or terabytes large, would involve a lot of overheard. But in fact these design decisions
+are based on measurements. Which show up, real file systems that showed that most
+file accesses are by a single user. And most files tend to be small. Okay. So this is the common case for
+most file accesses and so AFS is catering to this
+common case over here. It's making these common
+cases really fast. So yes, files that are gigabytes or
+terabytes size may become very slow, but those are not the common files anyway. The most common files are small and
+accessed by a single user. And those are made really fast by dealing
+with entire files rather than blocks. Also even a client cache
+as large as a few hundred, hundreds of megabytes
+can be stored in RAM. And nowadays, you can stores caches
+that are even a few megabytes in RAM. Also finally, file reads are much
+more frequent than file writes. And so if you serve entire files, then the reads can be served locally and
+the client itself. Rather than going to the server for
+blocks. And typically these reads
+are also sequential, so storing these files on
+disk is fairly efficient. Because now you access consecutive
+blocks on this and the client side. A few more details about AFS. The client system is known
+as a Venus service, so every client is running a Venus daemon. And the server side it's known as
+a Vice service or the Vice daemon. Reads and writes are optimistic,
+because whe, whenever a file is opened, the entire file is sent
+over to the client side. The read and write can be done in
+the local copy of the file at the client machine, at, at Venus. When a file is closed if any writes
+were done to the file then those writes are propagated to the vice. Which then updates its copy of the file. When a client opens a file,
+the vice, of course, sends the entire file as we've discussed. But it also gives it a call back promise. The call back promise is essentially is
+a promise that says that if another client modifies this file and then closes it. Then a call back would be
+sent from Vice to this Venus. Okay, so
+essentially if a particular client, Venus, has opened a file,
+it's given a call back promise. That says that if another client modifies,
+opens, modifies and then closes a file. Then this client would be
+informed about that modification. Typically the call back state that is
+maintained at Venus's is only binary. It says that the state is either valid or
+if the call back is actually done, as a result of another client's updates. Then that state is set to be canceled. Which means that essentially this
+Venus would then need to go and fetch the file again from device daemon. Okay, so that wraps up our discussion
+of distributed file systems. Which are very widely used
+today both in data centers and in smaller scale clusters. We've discussed the design of a vanilla
+distributed file system as well as two very popular file systems, NFS and AFS. This is only the tip of the iceberg. And there are many other file
+systems out there today. Both cutting edge research file
+systems also as file systems, that are in use, today. Very widely in clusters and
+in data centers. [MUSIC]

@@ -1,0 +1,243 @@
+[MUSIC] Hi there.
+In this lecture, we're going to discuss this concept
+known as Distributed Shared Memory. So far, in the course whenever we resume
+that processes communicate with each other over a distributed system. We assume that they use a network. This is a message passing network
+where a process sends a message and none of the processors receives a message. But what if we allowed processes instead
+to share memory pages with each other where processes,
+might be able to write and read pages. So if a process wrote to a page number
+five and another process read from a page number five this would make it much
+more easier to write programs. We could then take programs
+they were written for a regular multiprocessor operating systems
+and then just run them over a distributed system, where you a have
+a network underneath. So you might be able to
+reuse the programs as well. So this is the concept that is
+known as distributed shared memory, where you have processes sharing
+pages with each other but in fact they are doing this over a, a message
+passing network that is underneath. So processes virtually share
+pages with each other but underneath, they're, the underlying
+distributed shared memory system is implementing this by using
+the message passing. So that's the main challenge over here. So distributed shared memory, in fact,
+is trying to, achieve in software, what has already been achieved in hardware
+in the multiprocessor operating systems. So multiprocessor operating systems
+you have multiple processors sharing a common bust,
+sharing a common memory and they already communicate with each
+other and they share the memory, right? So they share the pages of the memory. Well you want to implement the same thing
+in software over a distributed system, so it's the software version of
+multiprocessor communication, but, over the network, okay? So that's a main challenge over here. In fact, distributed shared memory and message passing are equivalent to
+each other in the sense that, given a distributed shared memory system you
+can implement the message passing system. You, you, you do this by sharing a common
+page as a buffer where you read and write messages, essentially you use
+it as a producer consumer buffer. You can also do the reverse, where you
+can implement the switch head memory over a message passing network and we
+will see how to do that in, this lecture. So in order to do that, you need to
+maintain at each process a cache, a cache stores some pages, that were
+recently accessed by that process. When a process wants to read or
+write a memory address in a page. It first checks if that page
+is present in the cache. If it is present then,
+it uses that version of the cache. If it's not, then it, then it may need to fetch, that
+page from somewhere else in the system. And so, essentially a cache
+is a collection of pages that have been recently accessed by the process
+that owns that particular cache. So you notice in this figure that
+every process has its own local cache. Typically this cache is of course
+located on the same machine and on the same memory, and
+the same operating system as that process. Now pages are typically mapped to
+the local memory of that process, the cache is mapped to the local memory. As well when a page is present in
+memory it is called a page hit, so when the process tries
+to access a page and it is already present in
+memory it is a page hit. However, if the page is not present
+in memory it's called a page miss and this leads to a page fault. A page fault happens in regular paging
+systems that are implemented by operating systems as well and typically in a regular
+paging system and operating system. When a page fault occurs,
+operating system goes and fetches a particular block from
+the disk and stores it in main memory. In a distributed shared memory system,
+however the page fault handler, the kernel trap handler that
+is involved in the page fault runs the distribute software,
+distribute, shared memory software. Which then might fetch the page
+from a different process elsewhere on the network, 'kay? And it typically does
+this by using multicast. So we are replacing some portion of the
+kernel, in there with our DSM software. So essentially distributed shared memory
+can be implemented in any system that that in, that, that involves paging. By replacing the page fault handler and a few pieces of software in
+there with appropriate software. So a few terms before we
+describe several scenarios, the owner is that special process that has
+the latest version of a particular page. So every page has an owner
+process at an incremental point of time that process owns
+the latest version of the page. The owner of the page might
+change from time to time as you will see as we go along. Second, each page is either in
+the read state or the write state. We know this as the R state or
+W state respectively. When a page is in the R state,
+the owner has a read copy but other processes might also
+have link copies, 'kay? So this means that multiple processes
+are allowed to read a given page simultaneously. However, no, right copies exist of that
+page when any right copy exists, when any page, when a given page is in the W
+state, only owner has a copy of the page. No other copy of the page exists at
+any other processes in the group. This means that essentially
+rights are exclusive but reads can be shared with other processes. Of course here,
+when I'm saying an owner has a copy. I mean that the owner has a copy
+of the page in its own cache. When I say, a process has a copy,
+I essentially, meaning that the process has a copy
+of that page in its own cache. So, let's discuss a few
+scenarios that might occur when a process is trying to do a read. Here, in all these scenarios,
+process 1 is attempting a read and there are six scenarios
+I'm going to discuss here. In this first scenario,
+the process 1 is the owner of the page and has a page already in the R state. In this case, the read is served
+directly from the cache of process 1 and no messages need to be sent out over
+the network, so that's the first scenario. Let's look at the second scenario, in the
+second scenario the process 1 is the owner of the page and
+the page is in the write RW state. Once again, in this case, a read by
+process 1 can be directly from the cache and it does not need,
+any messages to be sent over the network. And the third scenario, the process one is
+the owner has a page in the read state but there are bunch of other processes that
+also have the same page in the read state. In this case, processes three and four
+are in the read state for that given page. Once again, process one, when it reads
+the page, the read can be served from the cache and no messages need to be
+sent The fourth scenario is where, it's similar to the third scenario
+except that someone else is the owner. And once again here the read can be
+served from the cache at process one, and no messages need to be sent. Now let's get to the other scenarios
+which need, something else to happen. So in the fifth scenario here, process 1
+does not have the page in its own cache other processes have
+the page in the R state. So in this case, processes 3 and
+4 have the page in the R state. In this case, process 1 asks for
+a copy of the page for this it uses multicast inside
+the group of DSM processes here. When it sends out a multicast message
+asking for this particular page, say page number five then the owner responds
+back wit, the latest version of the page. And, then a process 1, marks the pages R, as in read state and then it can do
+the read directly from the cache itself. So the end state in this particular case
+would look like this where process one refreshed the page and then mark it as
+R and then do the read from itself. Let's get to the sixth and the final
+scenario, where process one is trying to read the page and there is a right
+copy of the page located elsewhere, in this case process 4 which is also
+of course the owner of that page. In this case, process 1 needs to ask
+the other process to degrade its copy to the to the R or to the lead mode. It locates this process via multicast, so essentially it sends out a multicast
+to the group and the other process that is the owner responds back to
+the multicast saying hey I am the owner. So process 1 fetches a page,
+marks it as R, and then it does a read. In the meantime, process 4 also
+degrades its copy from a W to an R. So the end state in this case looks like
+this where process four has changed its, copy from W to an R. It still retains copy of the page so
+that it can continue to read it and process 1 also has a read copy of
+the page so it can continue read it. Process 4, if it wanted to write
+the page again it would then need to do something as it cannot write
+this page as is in this particular state. So let's discuss what happens with writes. So here is one scenario for a write,
+process 1 is trying to write a given page and it is the owner of the page and
+it has a, a write copy of the page. In this case the write can be
+done directly to the cache and normally just need to be
+sent out over the network. Second scenario, process 1 is the,
+owner of the page it has, the page in the read state and the other processes,
+the have the page in the read state. In this case, process 1 needs to ask
+the other processes to invalidate their copies of the page, 'kay? So it does this by using multicast it
+sends out a multicast message saying hey please invalidate all your copies
+of the page, I want to do it right. Once this is done, it marks its own copy
+as W, meaning it can be now written and that it does it right,
+in this particular state. So in this case you notice that page
+three, processes 3 and 4 have invalidates all their copies of the page so they can
+no longer use that copy of the page. If they want to do any operations on
+that particular page they need to fetch a new copy from the new owner. In the meantime, process 1 now has a write
+copy of the page and it can go ahead and do both reads as well
+as writes on this copy. That's the second scenario for the write. Let's discuss the third scenario. In this case,
+someone else is the owner, and the process 1 has a page
+in the read state. Once again, this is similar to
+the previous case except that, the process 1 now addition now
+needs to become the owner. So the other processes are asked to
+invalidate their copies of the page they do so, processes 3 and 4 do so,
+here in this particular figure. And process 1 gets, the ownership of the
+page as well as marks the page as W and then doesn't write on that page. And here's the fourth scenario,
+process 1 does not have the page at all. Other processes have the page in either
+the read state or the R state or, or the, or the W state. In this case, I just showed the R state
+but it doesn't really matter the, the operations similar if other processes
+have it in the write state as well. Essentially process 1 asks other processes
+to invalidate their copies of the page, again it uses multicast for
+this, it fetches all copies, it uses the latest copy or it can just
+fetch the copy directly from the owner. It marks its copy as W and
+it becomes the owner. Other processes, 3 and 4 this case
+invalidate their copies of the page so they can't use that copy anymore. We need to fetch,
+a copy from the latest owner. So even though the slide here says fetch
+all copies you really don't need to fetch all copies. You just need to ask,
+send out a multicast and have only the owner respond back to you
+with the latest version of the page. So that is known as the invalidate
+approach, where when you do a write and other processes have a copy of the page, you ask them to invalidate
+their copies of the page. The invalidate,
+approach works well in many of the cases. However, there are some cases where,
+you might have bad behavior, in the invalidate approach. If ytwo processes write the same page
+concurrently, for instance, if they are writing different variables that
+happen to reside on the same page then there's a flip flopping behavior where
+one process invalidates the other and then soon after the second process
+invalidates the first one. And this involves loss of network transfer
+because essentially on every invalidate you fetch the new copy of the page over,
+to, another process. Okay, so this is what is known as false
+sharing when unrelated variables fall on the same page and
+this results in flip-flopping behaviour, in the invalidate approach to
+distributed shared memory. Essentially what's happening here is that
+the false sharing happens when the page size is so large that it, it captures
+more than the locality of interest. Every processor has a locality of interest
+which is typically the window within which it is accessing variables and changing variables, the page size needs to
+be just about the locality of interest. But this of course is hard to know because
+the locality of interest depends on the application,
+it depends on the processes themselves and of course it can vary over time. In general, you want your page size to
+capture the locality of interest, if the page size is much larger you can have
+false sharing where different processes. Have variables on the same page and results in this flip-flopping
+behavior that we just discussed. If the page size is too small then,
+you know? Your capturing only a small portion
+of the locality of interest and you end up incurring too
+many page transfers. The pay, there are way too many pages in
+the system and so you incur a very high overhead in transferring these pages and
+this also is very inefficient. So setting the page size is an important
+concern in distributed share systems you want it set not too high but
+not too low either. An alternative approach to the invalidate
+approach is what is the update approach. In this approach,
+multiple processes are allowed to have the page in the right state so
+unlike in the invalidate approach where. At most one process could have
+a given page in the right state, here multiple processes are allowed to
+have a given page in the right state. When a process writes to a page it does
+not invalidate the other processes, instead it sends them multicast saying
+hey, I have written byte, the bytes at address so and so with these values,
+please update your copies of the page. 'Kay, so that's why this is
+known as the update approach. On a write,
+you send update messages to the other processes that are currently
+holding write copies on this page. So in this way the other processes
+can then continue reading and writing this particular page. Update the update approach here is
+preferable over invalidate under some situations only, when there's
+a lot of sharing among processes. When writes happen to very small variables
+and when page sizes are very large. But in general though, the invalidate
+approach is the more preferable approach because it tends to work
+well in more of the cases, more of the realistic cases
+than the update approach. Consistency, whenever you have multiple
+processes sharing data such as pages, consistency comes into the picture. We have discussed consistency before. We have discussed several consistency
+models when we discussed key value stores, and no sequential store systems and
+those key, those same consistency
+models apply here as well. Those include linearizability and sequential consistency,
+very strong models. Causal consistency, FIFO consistency,
+which otherwide is known as, otherwise is known as pipelined RAM
+consistency and also eventual consistency. There are also other models such
+as release consistency that originated from the structured memory and
+the multiprocessor architecture areas. And these should be familiar to you from,
+earlier in the course. In fact, all of these terms that you see
+here originated from the area of hardware architecture and multiprocessor, architecture,
+as well as distributed shared memory. And then later they were
+adapted by key value stores and those sequence stored systems,
+because after all it's the same concept there where processes share,
+certain, memory. So as one goes on the order as you know,
+the speed of the system increases, speed of reads or writes increases, but of course the consistency gets weaker and
+weaker. So distributed share memory has been
+a pretty popular area for a while. It was popular up until about a decade ago
+and then it started falling in popularity. But, some have surmised that it
+may be making a comeback now with faster networks like Infiniband and
+other faster networks. As well as with, solid state drives and other newer versions of solid state
+drives coming into the picture. Remote direct memory access also
+known as RDMA where one, machine or a processor on one machine accesses the
+RAM of another machine, over the network. That is becoming, more and more widespread
+now it's becoming more realistic now. And only time will tell whether DSM or
+distributed share memory will make a comeback, and become,
+more widespread in today's machines. As of now,
+it's not really very widely used today. So this is distributed shared memory
+where processes share pages instead of sending and receiving message is
+a useful abstraction to write code. Where if you've written code for
+processes that you know, share the same memory over one
+operating system, you know, you can simply take the same code and run
+it over distributed shared memory system. Where these processes are instead
+different machines communicating over a network. So distributed shared memory essentially
+provides a virtual abstraction of process sharing pages while underneath, it
+is running over a message passing network. There's a distributed shared memory can
+be implemented over a message passing interface and also vice-versa. So, these two forms of communication
+are in fact equivalent. And we've discussed two
+different flavors of of implementing distributed shared
+memory they're known as invalidate. Which is a more popular approach and update which is a less popular approach
+but it's an alternative, available to you. [MUSIC]

@@ -1,0 +1,12 @@
+[MUSIC] This week we are going to study two
+important classical topics, distributed file systems, specifically we're going
+to see the design of NSF as well as AFS. This is a very classical topic, distributed file systems have
+been around for a long time. Today's generations of file systems such
+as HDFS are not the first distributed file systems. So there are many important concepts that
+we can learn by looking at these old, classical distributed systems. Many of which continue to be used today,
+NFS and AFS are still used today. We also studied distributed shared memory,
+which may be coming back into prevalence with some of
+the trends in today's market. In orthogonal topics,
+we'll see sensor networks once again. This is the topic that's not necessarily
+related to cloud computing but is on the periphery. And so here we'll give you a teaser so
+that you can go and look up the topic more by yourself. [MUSIC]

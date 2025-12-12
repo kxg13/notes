@@ -1,0 +1,330 @@
+[MUSIC] In this next series of lectures, we'll be seeing what distributed
+file systems look like. In today's lecture this lecture, we're going to look at what
+the file system abstraction is. And we look at a design for
+a manila distributed file system. In the next lecture, we'll look at
+a couple of real distributed file systems. So, what is a file system? A file system, as many of you know and
+have used in your real life. Contains files and it contains directories sometimes,
+the directories are known as folders. Essentially files contain data
+they might be your, programs, they might be, text,
+they might be executable files, and they might be a variety
+of other kinds of files. And the directories of course contain,
+many files inside of them. Files and directories which are provided
+by the file system are given a higher level of abstraction. And this enables users and processes
+to think about data stored in files and directories rather than forcing users and processes to think about disk blocks
+where files and directories are stored. That would be very uncomfortable, right? If you were thinking of whereas what
+are the disc blocks on my particular programming assignment or
+my particular videos are stored. That would be kind of an uncomfortable
+lower level of abstraction. Here the file system provides you
+a higher level of abstraction so that you are able to think about,
+user centric aspects and processes are also able to think about files rather
+than dealing with low level details. So a typical file may consist
+of the following components, it consists of a header and
+then it consists of the blocks. Typically the blocks are of the same size
+because the file system imposes a maximum size on the block or
+the block size might be a few megabytes. That's typical but of course it
+varies from file system to another. Those blocks, block 0 through
+block N minus one shown over here, contain the actual data for
+the file itself. So if you have a text file, then, you know, your actual text would
+be contained in these blocks. The header in turn, contains a lot
+of meta information about the file. For instance, it may contain time stamps when was the time when this file was
+created, that's a creation timestamp. That would include the date and
+the time at which the file was created. When was the fa, file last read? So whenever the file is read by any
+process, the read timestamp is updated. When was the file last written is
+maintained in the write timestamp similarly and
+finally when was the header last updated. If the header was last updated,
+at some time, then that time time and date is written in the header timestamp. Now of course, these are only samples
+there might be other kinds of stamps, in the actual file systems themselves. Next, the header contains
+what kind of a file this is. So it may contain information about,
+you know, whether this is a program file. Like a .c or .java or whether it's
+a text file a .text or a .doc or whether it's an executable file like
+a .exe or even an object file like .o. This is useful for processes that are opening the file
+to know what kind of a file it is. Next you have ownership, who is the actual
+owner of this file, which is the user. Or who, which is the u, what is the user ID of the user who
+actually owns this file right now? The owner may not be the only one who can
+access this file there might be other users who are allowed to access
+the file in different modes. Some users might be allowed to write the
+file other users may be allow, allowed to only read but not write the file and that
+is maintained in the access control list. The access control list
+maintains a list of, all the users were allowed
+to access the file. And for each user,
+it maintain information about which modes this user is allowed to
+access this file in. Is it a read only mode? Is it a read drive mode? Is it a write only mode? Or is it executed mode, or something else? Finally, you contain the, you have
+the reference count of the header. This is a important integer that
+is maintained in the header. The reference count refers to how
+many directories contain in this particular file. By default when you create a file
+inside a directory the reference count is set to one. This means that this file is
+contained in one directory. However, you could hard link the same
+file from other directories, and this would increment the reference count. And when you delete a file
+the reference count goes down by one. You see this when we discuss the API soon. But essentially, when the reference count
+reaches zero, you can delete the file. Okay, but by default,
+the reference count as one and it's incremented whenever
+you hard link the file. So what about directories? We have discussed files so far but directories are just treated
+like files by the file system. Instead of containing data, however,
+the directories contain information about the file that are there
+in the directories. The directories don't actually contain
+the files themselves that are inside them, instead they contain pointers,
+on disc for instance to the files. So that when you list the directory,
+it gives you the names and meta information about the files but also from the directory itself you can
+access those files on disc itself. This is where most of our discussion
+will be focusing only on files because directories are only
+a special case of files. So let's discuss what happens in the Unix
+file system, which is one of the most, one of the more classical file systems and a lot of today's file systems
+are based off of the Unix file system. Unix file system uses
+a notion of file descriptors. A file descriptor is essentially a handle
+for a process, to access that is read or write a file. Each process needs to open the file and obtain a file descriptor before
+it executes any operations on it. And then after it is done
+executing the operations, it needs to close the file descriptor. Whenever a file is opened by a process the
+operating system creates an internal data structure, for that file descriptor. So it creates a new file descriptor,
+creates an internal data structure and then returns a handle to the process. Then the handle can be used by the process
+for subsequent read and write operations. So for instance,
+in a typical Unix system or Unix like system, the process might call
+open to open a given file that already exists in the system with the file
+name and in a particular mode. The mode might specify that it's
+a read mode or it's a write mode or it's a read write mode,
+both are allowed too. Or it's an executable mode, or
+some combination of these three. This call goes to the operating system,
+which is running the file system, and then operating system returns
+a handle which is a file descriptor. Typically, the file descriptor is
+just an integer, which when passed, to the file system itself or an operating system tells it what it is
+the internal data structure to access. If the file doesn't exist in the system
+then you call create, on the file itself and that will again return the file
+descriptor after creating the file. Then you can do your read and writes and
+finally when you're done, when the process is done, with all its operations on the
+file it can close in the file descriptor. This does not delete the file this
+only closes that file descriptor and says to the operating system or
+to the file system, that this particular process is done with
+its operations on this file for now. So essentially, the open or create opens a
+session where the process reads a file and the close closes that session for
+reading and writing the file. So how do you read and write the file? Well once you have the file descriptor
+after you've called open or create, you can use the file descriptor
+as the argument in your recalls. So process, once it is opened the file
+may call read on the file descriptor with an internal buffer specified and
+the number of bytes that it wants to read. Well, this call doesn't really specify
+where in the file you start reading from. All that is done by maintaining a retry
+pointer as part of the file descriptor. So the file descriptor which is maintained
+inter, internally inside the file system maintains a retry pointer which is
+pointing to an offset within the file. Typically the offset, well the offset
+is initially zero by default but when you call a read with num_bytes
+set to some value, say ten, right? The read will start reading from
+the beginning of the file, the beginning because the read write pointer
+points to the beginning of the file. And then returns the you know, it returns the first ten bytes because
+num_bytes is ten into the buffer. The internal buffer of the process. But then, after the read is done
+the read-write pointer is automatically advanced by num_bytes bytes. So, the read-write pointer now
+points to the 11th byte in the file. A subsequent read done to the same file descriptor will
+start from the 11th byte, onwards. Okay, so there's an implicit read-write
+pointer involved here so that processes do not need to deal with explicitly saying
+where in the file they want to read from. The same thing is true for writes as well. When you call write on a file
+descriptor with a buffer that says what you want to write in the file and the number of bytes that says how
+many bytes you want to write. Again, the write starts from
+the read write pointer that is currently pointing to
+some offset in the file. After the write is done, the read-write
+point is advanced by num bytes, bytes. Now this is,
+the read-write pointer is kind of a median because the processes do not
+know, need, need to deal with eh, explicitly saying where you are in the
+file, but sometimes you may need to do so. You may need to actually locate
+your file descriptor read-write pointer in a file and
+that's where lseek comes into play. With lseek you can take
+a file descriptor and you can say that you wanted to point
+to a particular offset within a file. So this resets the read-write pointer
+to that offset within a file. This offset may be an absolute offset. You may say ten here and
+say absolute here for whence. In which case, the read-write pointer
+will point to the tenth byte of the file. Or you may say the offset is a ten and
+whence is relative, in which case, the read-write pointer is advanced
+by ten compared to where it is now. So that's a relative,
+advancement or a relative lseek. A couple, a few more operations that
+are useful, these are control operations. Link, unlink, and stat. So remember we, I mentioned, hard linking
+in the beginning of this lecture. Well, here is where linking and
+unlinking can be done. So you can link, a file, that is at an old link, to a new link
+by specifying these as parameters. This does not remove
+the file from the old link. Instead, it creates a new link
+that also points to the file. Okay? So creates a new link
+at the second argument, pointing the file at the first argument. It does not duplicate the file, it just creates a new pointer
+inside the file system. Now, essentially, you'll have, after
+this link, returns, you're going to have two different directories, pointing to
+the same file that is located on disk. And in this case you know, these old link
+and new link are unique style names and so the directories actually
+point to those files. Whenever you call link,
+this is hard linking here, it increments a reference
+point to the file, because the reference count p, refers to
+how many directories contain the file. This is known as hard linking, and there's
+a different kind of linking known as soft linking or symbolic linking,
+which does not affect reference counts. When you soft link or symbolic link a file, essentially
+you're creating a separate file that contains a pointer inside of the file
+to the file that you're linking to. When you delete the original
+file the symbolic file stays on, in an effort to junk on the file system,
+but it stays on because it does not
+affect the reference count itself. When you want to unlink a file,
+remove it from a directory, you call unlink on the, on the link and
+this decrements the reference count. So if you link the file, originally and
+its reference count is two, you can now unlink it from, one of the old links and
+the reference count will go down to one. The file will not be deleted. The file will still stay around
+with a reference count of one, with the directory, with one of
+the directories pointing to it. When you unlink the second, the file from
+the second directory that it, you know, that it was contained in, then
+the reference count goes down to zero and now the file can be deleted. Finally you can use these
+functions known as stat and fstat on the file name to get information,
+from the header such as the timestamps and the reference counts, into the buffer,
+in the process itself. Now these API functions that I've
+discussed are only the tip of the iceberg. Unix supports a variety of other APIs and,
+API functions. And, if you're interested in
+them you should look them up. So what about distributed file systems? So far we have discussed
+a case where the client, process that is accessed in
+the file system is located, is using the same operating
+system as the file system itself. And the file system was
+running inside the OS. What happens when you have clients
+starting on different machines that are different OSs than the server
+which is running on a different OS. When the files are stored on a server
+machine in these cases, the client machine or the client process rather does RPCs,
+or remote procedure calls to the server machine or the server process in order
+to perform operations on the file. We'll see this played out in more
+detail over the next few slides but what do we desire from
+distributed file system? Well, we desire a few properties. First, we desire transparency. Transparency essentially says that
+client process should be able to access DFS files
+the distributive system files, as if they were indistinguishable
+from local say, UNIX, files. So, accessing a distributed
+file located in a DFS, should be no different from
+accessing the local file. In other words,
+the API should be the same. In other words, the code that the client
+uses to access the local file should be the same as the code that
+the client uses to access the remote file. Also, the distributed file system may
+be changing the location of the file. For instance if the server is changed,
+it may be replicating the file for fault tolerance, maybe storing multiple
+copies of the file on different servers. And all of this should be
+invisible to the client. The client processes should not need to
+be able to know about where the file is located, whether or not the file is
+replicated in order to access the file and do reads and writes on it. Next, you want to support
+concurrent clients. So, the whole one of the bigger reasons to
+have a distributed file system is to be, is to allow multiple clients to
+concurrently or simultaneously read and write, a file. Okay, and so you want a DFS to
+support concurrent clients. And finally, you want to have
+replication for fault tolerance. You may want to replicate the file or
+certain blocks of the file across different servers so that if some
+servers fail, you don't lose the file. You still have at least one
+copy of the file around. So when you have replication or
+concurrent accesses, once again there's a couple of
+semantics that you need to worry about. The first is one-copy update semantics. This essentially says that when a file is
+replicated, its contents, as visible to clients, are no different from when
+the file has exactly one replica. Okay, so essentially this is saying
+that even though the file is replicated, as far as the client operations
+are concerned, the end result is the same as if the file had exactly one copy and
+was not replicated at all. Since you have RPCs going on between
+the client and each of the clients and the server you need to choose
+the semantics of your RPCs. You remember from our, discussion of RPCs earlier in the course
+that RPCs may have semantics. At most once operation,
+at least once operation, semantics were the two common,
+cases that we discussed. You need to choose which of these, you
+use for your file system very carefully. If you choose at most once for
+a particular operation, you need to make sure,
+that those operations are not repeated. For instance append operation
+are okay with at most once because then those are not repeated. You don't want to repeat
+appending the same, piece of information to
+your file multiple times. However some operations can be repeated
+multiple times without any side effects even though they
+are repeated multiple times. These are known as idempotent operations. For instance,
+reading a file at an absolute position or an absolute offset within the file
+is an idempotent operation. And no matter whether you do it
+one time or a million times, you're going to return the same result
+as long as the file doesn't change. So operations that are idempotent can
+be used with at least once semantics. Next you would need to
+worry about security. When you have a distributed file system, your messages are going to
+cross over the network and this means that attackers might be able
+to intercept and modify your messages. And so you need to make sure that
+two properties are satisfied. They are authentication and authorization. Authentication essentially says that
+the use of the server is convinced that, the client process. Is acting on behalf of the user that in
+fact, it is claiming to act on behalf of. Okay, so this actually, essentially
+authenticates the client process. After a user is authenticated or
+after a client process is authenticated, you need to verify that that user or
+that client process is actually allowed to access the file and perform
+operations in a legal manner, okay? You know, if it's trying,
+if the process is trying to read the file, then the process should actually
+be authorized to read that file. In fact, it should be present in
+the access control lists of that file. If it is trying to write the file, then it should actually have
+permission to write the file. So how do you maintain these permissions? Well, there's two popular flavors for
+maintaining these permissions, they are ACLs or access control lists and
+capability lists. One is the inverse of the other. Access control lists maintained
+on a per file basis. The list of allowed
+users who are accessed, who are allowed to access that file. And for each user, what more it is
+allowed to access that file in. For Unix-like DFSs, distributed file
+systems, that typically the mode is read, write, execute, or
+some combination thereof, but for other distributed file systems, you could
+have other access modes allowed as well. But essentially, access control lists
+are per-file lists of users and allowed access modes. Capability lists is the inverse,
+which is a per-user list. And on-a-per-user basis,
+it specifies the list of files, and directories if necessary, that that
+particular user is allowed to access. And for each of those files, what mode or what modes that user is
+allowed to access those files in. Now, capability lists are often
+split up into capabilities. Each capability would specify,
+for instance, for a pair of user comma file whether that
+user is allowed to access that file, and what mode it is allowed to access it in. If there is not a capability for
+a particular user file pair, then essentially that user is not
+allowed any access to that file. Okay, so now, you know what access
+control lists mean or what ACLs mean and what capabilities mean. These are fairly commonly used terms in
+distributed file systems and, in general, whenever security is being talked
+off in distributed systems. Next, let's build our let's build
+our distributed file system. We'll call it our Vanilla distributed
+file system or Vanilla DFS. The Vanilla DFS runs on a server,
+and it also run at multiple clients. It consists of three types of processes. Two of them running at the server,
+one running on the client. On the server, you run the flat file
+service and the directory service. The directory service uses
+the flat file service. In other words, it's a client of the flat
+file service even though it's running on the server machine. And the client service runs
+at each of the clients, and it talks to the directory service and
+the flat file service. Essentially, the flat file service
+stores files without worrying about the hierarchical structure. You know, the Unix files, and
+also, Windows files, Mac files. All these file systems have
+a hierarchical structure for their files. The flat file service does not
+worry about hierarchical structure. It simply takes the file ids into account. The hierarchical structure is put
+into the directory service itself. So, let's look at what the flat
+file service's API look like. So, you can read a file
+by providing the file_id. This is the unique id of the file, specify
+a buffer into which you want to read. You want, you can specify the position
+in the file from which you want to read. This is the actual,
+absolute position in the file, and you want to specify the number
+of bytes that you want to read. So this reads num_bytes from
+the absolute position in the file. Which has a file id, file_id into
+the buffer in the processes address space. Now, a few things to note here. File_ id is not a file descriptor. There's no notion of file descriptors
+in our Vanilla DFS, okay? The file id is a unique id of that file. It's not a file name. It's a unique id, and you obtain that id
+by using the file name from the directory service, as you'll see soon. The other thing to notice
+is that we are actually, we are using an absolute
+position in the file. We are not using an automatic
+read-write pointer. Why not?
+Well, because you are using RPCs here. You want to support at
+least one's semantics, and you want this operation to be idempotent. You don't want t his operation to
+be repeated multiple times and cause side effects. If you are using a an automatic
+read-write pointer then, at least once, semantics would just not sit well
+with this particular with, with the, with the distributed file system. And so, you don't want to use
+automatic read-write pointers. You want the operation to be
+repeatable without any side effects. And that's why you want to do a read at a,
+at an absolute position. So, this operation,
+the read operation that I specified here, that are on the slide,
+can be repeated multiple times. And, it will result in the same,
+end effects, without causing any extra side effects. Second, we don't use file descriptors. Why not?
+Well, essentially, we want the servers to be stateless. We don't want to maintain any
+information on the server side. Including any data structures
+like file descriptors because the server might crash. If the server crashes, we don't want to lose any data and
+leave the server in an inconsistent state. We want the server to be able to
+recover from where it left off without using any state from
+the previous incarnation. Okay so, keeping the server stateless
+makes it easier to recover the server after failures because there
+is no state to restore. So, in contrast, as we have discussed,
+the Unix single machine operating system, file system is neither idempotent nor
+is it, stateless. Right?
+So done similarly from an absolute position to
+an absolute position in a file. We have the same semantics as a read. You can also create or delete a, a file
+with a given file_id, and you can get or set the attributes of that
+file_id using a buffer. What about a directory service? A directory services allows
+you to obtain a file_id for a given file,
+in a given directory using the file_name. This directory would be the slash
+dir meta hierarchical name of that directory within
+which that file is located. Then, after you locate this file_id, you
+can then use this file_id in the flat file service that we already discussed to
+then execute operations on the file. You can also add a name to a particular, a directory with a given file_name and
+this increments a reference count. You can also un _name a particular
+file_name in a given directory, this decrements a reference count. If it reaches zero, then,
+the server can then delete that file. For a given directory, you can also, get the list of all
+files that match a given pattern. And this is kind of like ls,
+minus al or dir in Windows followed by a grep in Unix or
+a find in Windows. Okay, so, that's our Vanilla
+distributed file system. In the next lecture,
+we're going to see the design of two very popular distributed file
+systems that continue to be used today. They are NFS and AFS. [MUSIC].
