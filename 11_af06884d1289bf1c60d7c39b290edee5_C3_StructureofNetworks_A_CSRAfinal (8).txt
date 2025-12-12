@@ -1,0 +1,342 @@
+Hey, everyone, I'm Aishwarya. I'm a faculty member here at UAUC. In this lecture video, I'll be covering
+some basics of ML and then talk about distributed machine learning, and
+then also talk about some ML frameworks. A lot of people say that ML is nothing but
+statistics. While there is some truth to it,
+there is also more to ML than statistics. Machine learning essentially trains model,
+right? A model is a computer
+representation of something. So what are some examples of models? You might have models, for example,
+to recognize objects such as cars or cats. Detecting a human face in a picture
+is another example of a model. So there are two things when
+it comes to creating a model. The first is training and
+the second is inference. Training means that you use a bunch of
+data to train a model's parameters so that later the model is able
+to do some inference for you. So in the above example, you train a model
+on hundreds of images of cats and cars. And later given an image, the model can tell you whether that
+image is that of a cat or a car. Typically, you do training
+on one data set and then you do inference on
+a different data set. So there are two types of training,
+supervised and unsupervised learning. So, supervised learning means
+that the images are labeled. For example, when training a model to
+recognize cats or cars and images, you're given also a label for
+each of these images, and you can use this information
+to better train your model. However, sometimes you don't
+have labels for images, and that's when you do something
+called unsupervised learning. Anomaly detection is an example where
+unsupervised learning is used in the real world. So you have a large data set and you want to discover some data points
+that are anomalous in the data set. So that's why you used unsupervised
+learning specifically, use something called clustering. Recommendation engines is another example
+where unsupervised learning is used. Often in many applications,
+that is, ML applications, you use something called STD or
+Stochastic Gradient Descent. It's basically an optimization algorithm
+that's used to find the model parameters that gives you the maximum accuracy
+on a particular training data set. There are many systems that implement STD,
+and many distributed machine learning
+papers use STD as a common benchmark. Basically, they are doing distributed
+versions of Stochastic Gradient Descent. Let's discuss neural networks,
+which are very popular. Here, on the right, you have an example
+of an artificial neural network, also known as ANN, which is a model. Here, this ANN model
+detects a bird in a video. So the input to the neural
+network here is an image, and the neural network contains multiple
+operators and layers, as shown. So you have multiple operators that
+operate parallel, and then you have layers of operators, and operators from one layer
+communicates data to the next layer. And finally you get an output saying
+either this image contains a bird or no, this image does not contain a bird. So ANNs are widely used in computer
+vision and natural language processing. So, again, ANN is nothing but
+a layered graph of operators. And in each layer you have multiple
+operators that can operate in parallel, just like the stages of a Mac phase, and these operators are computationally
+heavy and expensive. So typically you run them
+on GPUs instead of CPUs, because GPUs can do certain mathematical
+operations very efficiently. Okay, so as I was saying, there is
+communication between one stage and the next stage of operators, right? And it's common to have an all to all
+communication between these stages. So an operator in one layer,
+sends its data, or subset of data to operator in
+the next layer, and so on. And these edges between the layers
+also contain what we call weights. Basically, these weights
+are the model parameters, right? So the data that's passed along
+these edges are called tensors. Tensors are nothing but
+multidimensional vectors. And so
+when a tensor is passed along an edge, the weight on the edge is used to multiply
+the value of the dead cell, right? So oftentimes there is also
+something called a bias, which you add to this computed value before passing
+it as an input to the next stage. So the model that we
+are training is not the graph, but the weights and the biases. So the graph is fixed, right? The graph doesn't change during training. What you train are actually the weights
+on the edges and operators. And as we change the weights,
+the model either would perform better or it would perform worse, right? So the bottom figure on the right here
+shows a very simple layer that we call a perceptron layer. So you have inputs X1 to XN, then you have the weights that
+you train the model on, right? And then you take a weighted sum of them. So basically you take w0 and
+multiply it with x0 plus w1 times x1, so on till wn times xn and
+then you apply a step function. And if the weighted sum crosses
+a threshold, then you output a one, otherwise you output a zero, all right? For example,
+in the above bird detection case, you can calculate a lot of features
+in the first few layers of the ANN. And then you may detect, is there a beak,
+is there a leg, is there a claw, is there other features, is there a wing? And the last layer,
+you use all of these features to see if it crosses a threshold for
+you to call this image it's a bird. Maybe sometimes you have some features,
+but not all, right? So in that case,
+you won't cross the threshold and you wouldn't call it a bird, right? Okay, again, to reiterate
+the parameters or the weights, right, weights on the edges and
+the weights on the operators are the ones that you train the model right,
+you do not change the graph itself. The graph is static. So let's talk more about machine learning,
+training and inference. So you have some data that you
+pass into training, right, and this data passes forward
+through the neural network, and the neural network gives
+you a predicted output. During supervised learning,
+you also have the labels, right, so you can compare the predicted output and
+the label and see if they are the same. If so, it's great, your model is correct,
+but if they are not, then you can use it to adjust some
+of the weights of the model so that it gives you
+the correct output later. So in the training phase, there is
+additional backward pass to adjust the model weights so that if the same
+input were to be passed in later, the model will give you
+the correct output. So the data is passed forward in
+the training phase to predict a result, and then the error is calculated
+against an actual label. And then maybe you followed up with
+a backward pass that adjusts or updates some of the weights so
+that in the future, if you were to pass the same input again,
+you would get the correct output. So the data that is passed between
+the operators are tensors, right, which we already saw, which are multidimensional
+vectors that are typically very huge. And during training, you train on one
+item at a time, like one image at a time. So you pass in one image,
+you then pass back a result and then do some correction and then do
+the next image, and so on and so forth. Sometimes that can be inefficient, right? So the training is often patched where
+you pass forward not just one image, but a small set of images. And then based on on how
+those images are predicted, you might pass back some
+corrections on the backward pass. For instance,
+if many of them were correct, then you don't need a backward pass. Maybe, let's say, if half of them were
+incorrect, you do a backward pass so that you can update the model parameters. So matching can make
+the training very efficient. And once you have the model trained,
+you do inference, right? So you apply the model to
+detect on unlabeled images. There you just need the forward pass,
+you don't need the backward pass. So the inference, which is also
+sometimes referred to as prediction or model serving, only has a forward pass. There is an emerging area called online
+learning, also known as continual learning, where you do training as well
+as inference at the same time, right? Okay, now let's talk
+about hyperparameters. So whenever we say parameters and machine
+learning models, we refer to the weights. That's what we are trying to train, right? But there are also something
+called hyperparameters. So hyperparameters include configuration
+settings for your entire job. For example, what's your batch size? If your batch size is large,
+you might be able to do training fast, but it may not be very accurate. But if it's too small, then training might
+be slow, but it might be more accurate. There are other hyperparameters, but overall these hyperparameters are
+independent of the weights of the models. The model's weights are the parameters,
+and then you have hyperparameters
+like the batch size. So there are different types of
+neural network models, right? So feed forward neural network or
+FFN is a model. That model does not contain any loops. DNN or Deep Neural Networks
+are a different type of model. So these are networks
+that have hidden layers. So a traditional ANN, an artificial
+neural network has only two layers, the input and the output layer. And there are typically
+no layers in between. That's a typical ANN, right? But if there are layers in between,
+that's a deep neural network. So you have many layers between
+the input and the output layer. That's DNN. Convolutional Neural Network or CNN means that there are additional
+layers of convolutions. Convolution is a mathematical concept. And convolutional neural networks are used
+in Facebook photograph captioning, for example. And then there are also RNNs or
+Recurrent Neural Networks, which contains loops
+within the same layer. This is often used to
+capture time aspects. For instance,
+autocorrection on your phone uses RNN. RNNs are also used in Gifs, which have
+some temporal components in them. There are also some other
+variants that we list here, but I'm not going to talk about it in detail. Let's talk about distributed
+machine learning. So you have all of this training data,
+which is the collection of input and output labels and then you are also
+trying to learn the model weights. And all of these can be very huge. So in a centralized machine learning
+approach where you're trying to do all the training and
+inference just on a single server, it could be very slow and sometimes
+it could be very not possible, right? So it could be infeasible because
+the server doesn't have enough memory. So you may want to split your ML
+training across multiple machines. And we call this distributed
+machine learning, where you use multiple workers
+to parallelize the learning. You can also use this to
+parallelize inference too, right? So you can speed up inference. So how does this approach
+work at a high level? So the figure on the right shows
+a distributed machine learning approach which is very popular, which
+we call the parameters over approach. Here, in this approach, you run multiple
+copies of the model called the model replicas on multiple workers. And then you divide the training
+data into a number of subsets and run a copy of the model on
+each of these subsets, right? So the model communicates updates through
+the centralized parameter server, hence the name. This server keeps the current state
+of all the parameters in the model. And usually, you would have more than
+one parameter server where the state is sharded across multiple parameter servers,
+right? And so each shard is just responsible for
+storing and updating a subset of the model parameters. And here's how it works at a high level. So, before processing each mini batch
+of inputs, a model replica would ask the parameter server for
+the updated copy of model parameters. So after receiving the updated
+copy of parameters, the model replica would process the mini
+batch of inputs, compute the parameter gradients and then send the gradients
+to the parameter server. The parameter server then waits for
+all the set of model replicas to send the gradients and then it would
+compute the updated model parameters. Now, it would send the model
+parameters to the model replicas. Now, in the next iteration, the model replicas would use the updated
+parameter values and then do the training. And then compute the gradients and
+then send the gradients back, so on and so forth, right? So that's how the parameter
+server approach works. So the example that we saw on the previous
+slide is an example of data parallelism. But there are also other
+types of parallelism. So you have data parallelism,
+you have model parallelism and then there is something called pipeline
+parallelism, which I won't discuss. So in data parallelism you basically
+start the same model on every one of the workers, right? So you shard the input
+data across the workers, but all the workers
+are running the same model. And they perform training on
+a different set of inputs. And then they send the data to a parameter
+server which calculates the parameters and sends it back and so on and so forth. But the more important thing is the model
+is the same on all the workers, right? That's what data panelism refers to. So either you could be using the
+centralized parameter server approach, but there is also a different technique which
+we call the all reduce approach where you do not have a parameter server. But instead workers simply multicast their
+gradients to all the other workers, right? And every worker receiving the gradients
+from all the other n-1 workers and it would just compute the updated model
+weights locally just like you would compute that in a centralized
+parameter server. Now, there are also two
+different variants in training. So you have the synchronous
+training method and then you have an asynchronous variant. So, so far we've been discussing
+the synchronous variant where in every iteration the worker processes a bunch of
+inputs, sends the parameter gradients, maybe you're using the parameter server
+approach or the already subtroach. And then you get the updated model weights
+and then the next iteration starts, right? So that's a synchronous approach. However, you can also do
+an asynchronous training, right? Where a worker,
+when it finishes its iteration, it doesn't wait for the other
+workers to finish the iteration and it just starts the next iteration, right? That is what we call
+asynchronous training. And researchers have shown that
+if you do asynchronous training, you might sometimes converge
+much faster with your model. And your model might actually be TP
+almost as accurate as the synchronous training approach. So that's data parallelism. Now, what's model parallelism? So in model parallelism, so you have a
+model, and then you have some data, right? But the memory on the GPU is not
+sufficient to run the entire model. So you split the model, break the graph
+up, right, across multiple devices. And the models with large
+number of parameters or high computational demands typically
+benefit from model parallelism, where you have access to multiple GPUs and
+memory. But for some graphs, the communication
+costs might just dominate. So model parallelism
+might not be a good fit. But overall, both model and
+data parallelism would speed up training significantly,
+so that's distributed ML. Now, let's talk about some machine
+learning frameworks that are popular. So one such framework that's popular,
+which was built by Google, is TensorFlow, which is used for both large scale
+training, as well as inference. And similar to all the other data
+processing frameworks that are large scale, which we have looked
+into this course, right, TensorFlow hides the details
+of distribution. So the developer need not worry
+about implementing all the complex logic to distribute the training, the
+TensorFlow framework would do it for you. The TensorFlow framework would
+efficiently use several GPUs or CPUs for fast training. So TensorFlow can also help
+in running trained models for inference in production. And TensorFlow also has some support for
+running models on mobile devices. At a high-level, TensorFlow uses
+a unified dataflow graph, and this graph represents both
+the computation in an algorithm and also the state on which
+the algorithm operates. The dataflow graph naturally captures
+the structure of computation in machine learning training. In a TensorFlow graph, each vertex represents a unit of
+local computation called operations, and each edge represents either
+the outputs or the inputs called Tensors. So the figure here shows the architecture
+at a high-level of the TensorFlow platform. So TensorFlow provides a high-level
+scripting interface for you to construct these dataflow graphs. This way, users can experiment with
+different model architectures. Let's say, you want to add a layer or change the number of operators
+in the layer, and so on. You can experiment with all of these model
+architectures without actually having to modify the core system. So the core system is just TensorFlow,
+it would not change. So you can experiment
+with different ML models. So TensorFlow supports both CPUs and
+GPUs, and it also supports special processing units called
+Tensor Processing Units, or TPUs. So TensorFlow has a distributed master,
+which takes user requests and then gives set of tasks
+to dataflow executor. And the dataflow executor schedules
+the execution of the operators, and it tries to use parallelism
+whenever possible. So the runtime of TensorFlow contains many
+implementations of standard operations, and it's quite extensible,
+so you can add new things. And it also supports different
+communication protocols, such as you can use RDMA to directly copy
+the data onto a remote nodes memory. It can support direct GPU to GPU transfer,
+and so on. Or you can just use RPCs. So here you have an example of
+an image classifier that was written using TensorFlow API. So this is an older version of TensorFlow
+from the original TensorFlow paper that was published at OSDI. So the new API looks
+a little bit different. So as I said in the previous slide,
+TensorFlow provides a high-level scripting language for you to write and
+construct these dataflow graphs, right? And that's exactly what this example does. So here you're first
+creating a graph that is representing the image
+classification model. So you have the input layer, and
+then you have another hidden layer. Then you also have the weights and
+the bias vectors, and then you also have the output layer,
+right? So basically,
+you're specifying all of these layers, you have the placeholder for the inputs. You have the placeholder for the outputs, and you're basically telling TensorFlow
+what the graph would look like. Now, you also tell TensorFlow
+how do you compute loss. Right, so you have the labels,
+actual labels, and the predicted outputs. How do you compute the loss from them? What's the loss function? And you also tell TensorFlow what
+optimizer it should be using. So you specify all of this to TensorFlow,
+and then you just initialize the weights to some random values, and
+then you can start training. So you load one batch after the other and
+do the training. So you can specify all of these in a
+high-level language without worrying about a lot of internal details. And that's what TensorFlow makes it
+easier for ML developers, right? So the ML developer can experiment with
+different model architecture without having to worry about all the underlying
+details of how do you communicate between different GPUs. Or how do you pass along the values
+between layers, and so on. The TensorFlow framework is going
+to take care of that for you. On the developers, the machine
+learning developers can just focus on developing the right set of model for
+a particular workload. So now let's look at PyTorch, which is another machine learning
+framework that's also very popular. So PyTorch was originally
+developed by Meta, and it's used in many popular
+real-world applications. So one difference between TensorFlow and PyTorch is that while PyTorch
+uses the same computation graphs, like similar to TensorFlow, the
+computation graphs in PyTorch are dynamic. PyTouch also has this Nice feature where
+it can compute variance automatically. So PyTorch implements many popular
+algorithms and components, and it also has some domain specific
+libraries for text vision, audio, etc. And it also has a lot
+of popular data sets. So in PyTorch, again,
+you have the same Tensors, right, which are n-dimensional arrays, and then
+you have something called the modules. So the modules basically define
+what makes up a model, and you need to also implement a forward
+member function in every module. For example, if you consider a linear
+model and you take a module for it, the module would have a weight and
+a bias as parameters. And the forward function
+would generate the output by multiplying the input and
+the weight and adding a bias to it. So that's a high-level
+overview of PyTorch. Now, let's look at a very
+simple example here, instead of using a neural network,
+I have a very simple model. But the example here focuses
+on how to easily exploit data parallelism with PyTorch. So you start with creating
+a process group and specifying the distributed communication
+package that you're going to use. So here we are using
+something called glue. But what I want to focus on here
+is how to use data parallelism. So you have a very simple linear
+model here that we have defined, so that we're going to use. And you take it and you wrap it with
+DDP or distributed data parallel, and then you get your distributed model. Okay, so that's as simple as how do you
+get the distributed data parallelism out of PyTorch. So then you do the forward pass,
+you do the backward pass, and talk how you specify how to do these things, and
+you also update the model parameters. And all of this is similar
+to centralized learning. Of course, I'm not telling you
+a lot more details, right? So you should look into these
+frameworks if you're interested. But this is at a high level how
+easy it is to use PyTorch to do distributed data parallelism. So we talked about two popular frameworks. The final popular framework
+that I'll talk about is Jax. So Jax is quickly replacing
+TensorFlow inside Google. So Jax also provides you with
+a very high level API for you to do ML training and inference. So it provides a very
+familiar NumPy like API. So Jax has a lot of nice features. One fundamental feature it supports is
+that it allows you to compute gradients automatically. So computing gradients,
+as you might know now, is a very critical part of ML training. And Jax supports
+a transformation called grad, which takes a numerical
+function written in Python and returns you a new Python function
+that computes gradient automatically. It also supports just in time
+compilation of Python functions so that they can be efficiently executed. So there are some other features of Jax. For example, Jax supports a transformation
+called vmap that allows you to generate vectorized implementation of
+a function automatically. And also Jax supports automatic
+parallelization of functions through pmap. So pmap, again, is the transformation that
+takes a function written for one device and transforms it into a function that
+can run in parallel on multiple devices. So these are some nice
+features that Jax supports. And Jax is becoming something that's
+become very popular and also replacing TensorFlow within Google for
+a number of machine learning applications. So that's at a high level how
+these different machine learning frameworks work. If you're interested further, you should go look up these frameworks and
+learn more about it. But we just covered a very high level
+overview of these frameworks with some examples. So finally we have
+federated machine learning. So so far we've been discussing
+distributed machine learning, which assumes homogeneous
+data across workers. Doesn't mean that the data is the same. It just assumes that one worker does not
+have data that's very different from another worker. So the distributions of data on
+one worker are not different from other workers, right? That's distributed ML. But we also have federated machine
+learning that uses heterogeneous data across workers. So the workers here may be data centers,
+or some may be mobile devices, and there might be failures,
+possibly even some privacy issues. For example, in Google's Federated
+learning paper, they talk about how to use federated learning to
+predict keystrokes for mobile devices. The main difference here is
+heterogeneous data, right? One worker may have data that has a very
+different distribution than what another worker has, so that's at a high level
+what federated machine learning is. So that brings us to the end of
+this machine learning lecture. Thanks, and if you're interested more
+in this topic, I encourage you to read up on these topics more using different
+resources that are available on the web. Thank you.

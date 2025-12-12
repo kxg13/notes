@@ -1,0 +1,107 @@
+[MUSIC] In this lecture on the Scheduling series, we're going to see dominant-resource
+fair scheduling, which is a new concept that has been invented in just the last
+few years but has had a lot of impact. So here,
+we're discussing the problem of scheduling large numbers of jobs across a cluster. For instance, scaling VMs in a cloud or
+in a cluster. Different jobs may have
+different requirements and these requirements may
+span multiple resources. So for instance, a Job 1 may have tasks
+where each task requires 2 CPUs and 8 GB. Job 2 may have tasks where each
+task requires 6 CPUs and 2 GB. So then the questions arise, when you have
+these jobs that are together in a cluster, how do you schedule these jobs in a manner
+that is fair across different jobs? In other words, how many tasks of
+each job, in this particular example, our example, do we allow in
+the cluster to run concurrently. So that you ensure fairness
+as far as resource allocation is concerned
+across different jobs? In fact, what does fairness even
+mean in this particular case? So, dominant resource fairness, or
+DRF, addresses these questions. It was proposed by researchers from
+University of California at Berkeley. It proposes a notion of fairness across
+jobs with where the jobs have multiple, multi-resource requirements. And the researchers showed that
+the dominant resource fairness is fair for multi-tenant systems. It is strategy-proof. This means that a tenants
+can not benefit by lying. So if a tenant lies
+about it's requirements it does not really benefit by it. It can only suffer or
+just stay where it is. It's also envy-free which means that a
+tenant can not envy the allocation that is given to another tenant in the system. All of these are desirable
+properties because they eliminate the tenants from strategizing
+the system and from gaming the system. So, DRF is useful in scheduling
+virtual machines in a cluster. It's also useful in scheduling
+Hadoop in a cluster. It's, it's, it's useful very,
+very, hard jobs and these jobs have tasks that which need to
+be scheduled in a cluster and that and the tasks themselves have
+multi-resource requirements. DRF is used in Mesos, an operating system that was
+invented by researchers at Berkeley. That is intended and the operating system
+is intended as a distributed operating system for cloud environments. And DRF-like strategies are also
+used in cloud computing operating systems that have been built
+by several cloud computing companies. How does DRF work? Well, let's look at DRF
+through our example. So, Job 1, once again, our example, has tasks where each task
+requires 2 CPUs and 8 GB. We denote that as Job 1's resource vector,
+which consists of 2 CPUs, 8 GB, where 8 GB is the RAM or
+the memory required by the job. Job 2's task required 6 CPUs and
+2 gigabytes. And so its resource vector is 6, 2. Now consider a cloud or a data center
+which has 18 CPUs and 36 gigabytes of RAM. That's the resource vector
+of the cloud itself. Now, let's look at Job 1. So, each task of Job 1 consumes
+a percentage of total CPUs which is, it, it requires 2 CPUs and the total
+number of CPUs in the cloud is 18. So the percent of the total CPUs consumed
+by one task from Job 1 is 2 by 18 which is 1 over 9. Similarly, each task of Job
+1 requires 8 GB of RAM. The total RAM present in
+the cluster is 36, so the percentage consumed by each task
+of Job 1 is 8 by 36 which is 2 by 9. So, 1 by 9 is less than 2 by 9, which means that Job 1's dominant resource
+is the orange resource, which is RAM. So Job 1 is more memory intensive, or
+RAM-intensive than it is a CPU-intensive. So that's Job 1. Let's do a similar calculation for Job 2. Job 2's single task,
+consumes percentage of total CPUs which is 6 CPUs divided by 18 total CPUs,
+that's 6 by 18. As far as RAM is concerned,
+each consumes 2 GB of RAM, and the total GB of RAM is 36, so
+that's 2 by 36, which is 1 by 18. Here in the blue value, 6 by 18 is
+larger than the orange value, and so 6 by 18 is greater than 1 by 18. Which means that Job 2's
+dominates resource is CPU, so it is more CPU-intensive
+than it is memory-intensive. So Job 1's dominant resource was RAM and
+Job 2's dominant resource is CPU. So different jobs may have different
+resource types that they are dominant on. And DRF ensures the following property. For a given job, the percentage of
+its dominant resource type that it gets cluster-wide is the same for
+all jobs. In other words the, you allocate tasks to
+Job 1 and you allocate tasks to Job 2. So that the total percentage of
+RAM that Job 1's total tasks get is equal to the total percentage
+of CPU that Job 2's tasks get. Because RAM is the dominate
+resource of Job 1 and CPU is the dominate resource of Job 2. These constraints can be written
+as linear equations and solved. We won't go through those equations and solutions here, maybe just tell you
+the solution for our particular example. Okay?
+So for our example the the solutions turns out to be that Job 1 get's three tasks
+each with a resource factor of 2 CPUs and 8 GB. And Job 2 gets two tasks each with
+a resource factor of 6 CPUs and 2 GB. Let's ensure that this actually
+satisfies the DRF fairness rule. So Job 1's percentage of RAM is the total
+number of tasks given to Job 1 times the amount of RAM per task,
+that's the total RAM to Job 1, the numerator,
+divided by the total cluster RAM. So the number of tasks it gets is 3
+times 8 GB per task, divided by 36 GB. That's 2 by 3. That's do the similar calculation for
+Job 2's dominant resource which is CPU. The number of tasks given to Job 2 is 2. The CPU per task is 6 CPUs. Divide the total number of
+cluster CPUs which is 18. So that's 2 times 6 by 18
+which is also 2 over 3. So that's the that ensures
+that Job 1's percentage of RAM equals the Job 2's percentage of CPU. So every job gets the same
+percentage of the cluster as far as its dominant resource is concerned. And you can verify that allocating Job 1
+three tasks and allocating Job 2 two tasks also satisfies the total number of
+resources that you have, right? So Job 1 gets 3 times 2,
+6 CPUs, Job 2 gets 2 times 6, 8 12 CPUs, so that's a total of 18 CPUs. You do have 18 CPUs in the system. The RAM given to Job 1 is 3 times 8, 24. Job 2 gets 2 times 2, 4, so that's 28 GB
+which is less than the 36 GB we have. So you're using less than the total
+amount of memory in your system. But that's fine, because it's the price
+you pay for fairness in your system. So, DRF even though we've discussed
+it only for two types of resources, a, the, a resource that has only two
+components, the CPU and the RAM. It also generalize, generalizes to cases where jobs might
+have multiple resource requirements. It also to generalizes the cases
+where you have multiple jobs, not just two jobs in your system. So you can have multiple jobs, and
+each job can have CPU requirements, memory requirements, also network, and maybe disk
+requirements, and so on and so forth. And DRF will generalize even to those. DRF essentially, essentially insures that each job gets
+a fair share of that type of resource, which that particular job desires
+the most, meaning it's dominant resource. And this is why DRF is, in fact, fair across different jobs with
+multi-resource requirements. So to wrap up our entire discussion of
+scheduling, scheduling is a very important problem in cloud computing because
+you have limited resources. Typically processor and
+the memory resources and you have a lot of jobs with tasks that
+require access to these resources. So which jobs run when on which
+resources is a scheduling problem. We've discussed classical single-process
+scheduling algorithms such as First in Fist Out, shortest task first,
+Priority and Round-Robin. We've also discussed Hadoop scheduling
+strategies that are popular today, such as capacity scheduler,
+and the Hadoop fair scheduler. And finally, we've discuss strategies
+that are fair across multiple tenants in a multi-tenant cloud environment. Especially we've discussed
+the dominant-resource fairness strategy, which is actually gaining
+popularity today. [MUSIC]

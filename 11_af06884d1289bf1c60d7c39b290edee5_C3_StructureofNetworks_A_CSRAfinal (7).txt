@@ -1,0 +1,168 @@
+[MUSIC] Hi there, in this lecture we're going to
+see two types of scheduling approaches that are very popularly used
+with Hadoop clusters today. So Hadoop job, if you recall,
+consists of Map tasks and Reduce tasks. When you have one job in the cluster, and that's the only job in the cluster,
+its tasks can occupy the entire cluster. So different resources in
+the cluster can be allocated to that particular job's tasks. However, you might have multiple
+customers with multiple jobs, and these users, customers, are jobs that
+are known as tenants in the cluster. So you have essentially a multi-tenant
+system, where they are multiple tenants occupying in the cluster, and competing
+for resources that the cluster has. So you need an approach or a strategy to schedule all of these
+jobs from across the different tenants. And when I say schedule jobs, I essentially mean schedule the tasks
+that are inside these jobs. And sometimes you want to be fair across
+the different tenants in your system. You don't want to give one tenant much
+more resources than another tenant. You do not want to allow one tenant to
+complete the whole of your cluster, and deny access to the cluster
+to the other tenants. So Hadoop YARN has two schedulers that
+are very popular with installations today, the Hadoop Capacity Scheduler,
+and the Hadoop Fair Scheduler. We'll discuss the Capacity Scheduler
+first, and then the Fair Scheduler. The Hadoop Capacity Scheduler
+contains multiple queues. If you recall from our discussion of
+single process scheduling algorithms, the queues essentially contain jobs. So each queue contains multiple jobs. Each queue is guaranteed some
+portion of the cluster capacity. For instance, you might configure
+your system with two queues, Queue 1, which has 80% of the cluster, and
+Queue 2, which has 20% of the cluster. And in this case, you might have the
+higher priority jobs in the system go to Queue 1 because it has a lot more
+of the resources in the cluster. For jobs that are within the same queue,
+typically first in first out scheduling or first come first serve scheduling at CFS,
+FIFO CFS is used. This is again, something that you've seen
+in a single processor scheduling approach. But essentially, what happens here is
+that a job that arrived earlier would be given resources first. So whatever resources it needs for
+its task it's given first. And then, when that job is done,
+the next job in the queue is taken, and given resources. If the job is not able to fill that
+entire queue's capacity, for instance, if a job in Queue 1 occupies
+only 40% of the cluster, another job can be allowed to run
+concurrently with it in Queue 1 itself. And so, FIFO is typically used, but
+again, it's not necessarily used. You could modify the Hadoop Capacity
+Scheduler to use a different approach. Administrators allowed
+to configure the queues, these queues that are discussed, so you
+can configure each queue to have limits. There might be a soft limit,
+which specifies how much percentage of the cluster resources of that particular
+queue is guaranteed to occupy. Optionally, you can also specify a hard
+limit, which is the maximum percentage of the cluster resources that that
+queue is guaranteed to occupy. So this means that the queue
+cannot cross the hard limit. If the hard limit is 90% it means that, that queue cannot ever be given more
+than 90% of the cluster resources. Elasticity's allowed by this particular
+approach because if, for instance, there is only one queue that has jobs, then the queue might expand as much as
+possible to occupy the entire cluster. So if you're hard cap for
+instance, your hard limit is 100%, then that queue could be expanded
+to occupy the entire cluster. And its jobs can get the entire cluster,
+as long as resources are free. But if there are other queues in
+the system that are below their capacity limits, so for instance, if another
+queue had a soft limit of 20%, and it is running at 5%,
+it now needs to get more resources. Because, for instance,
+it might be having more jobs. That other queue may
+need to given resources. Which means that this queue, that is
+currently occupying the entire cluster, needs to give up some of its resources. So one way to do this might be
+to kill the tasks in that queue, but that's not what is done in
+the Hadoop Capacity Scheduler approach. Instead, you do not allow
+pre-emption at all. Because you do not want to waste tasks
+that are sort of part-way through. You don't want to kill any tasks. Instead, you simply wait for
+those tasks to finish. When a task finishes, you take away that
+part of the resource from the first queue, and give it to the other queue
+that is now requiring resources. So essentially, the elasticity or the scaling in portion here
+happens slowly as tasks finish. The resources are then taken away from
+that queue, which those tasks belong to, and it is given to the other queue
+that is requiring resources. So this approach here that you're
+seeing is slightly different to the Hadoop Fair Scheduler approach,
+which we'll see in a few slides. A few other features in
+the Hadoop Capacity Scheduler, the queues themselves can be hierarchical. So a queue might contain child sub-queues,
+which may then contain child sub-queues, and so on and so forth. And this is useful so that child sub-queues can be made to share
+resources equally in between each other. So for instance, if a queue is given
+to one particular organization, the organization might have
+multiple departments, and these departments are each
+given a child sub-queue. And these child sub-queues now share
+resources equally among each other. Scheduling in the Hadoop Capacity
+Scheduler can also take memory requirements into account, where the
+memory is typically specified by the user. And as of this particular recording,
+the Hadoop Capacity Scheduler only supports memory as
+a resource being specified. It does not support multiple
+resources being specified. So let's look at the other scheduler,
+the Hadoop Fair Scheduler. Here the goal is to target a multi-tenant
+system where you have multiple jobs or users occupying a cluster. And you want to ensure that all the jobs
+get an equal share of the resources in the cluster. But of course when only
+one job is present, you want it to get the entire cluster
+if that job requires entire clusters. So fairness does not mean you start a job
+even though resources are available. However, as other jobs
+arrive in the cluster, each job is given an equal
+percentage of the cluster resources. For instance, each job might be given
+an equal number of cluster wide YARN containers, where a container
+is a set of processor, and memory resources that is
+enough to run one task of one job. Container is a well accepted term in YARN, which you have seen
+elsewhere in the course. So the Hadoop Fair Scheduler
+divides a cluster into pools, and typically there is one pool per user. Resources are divided equally among pools. This ensures that each user gets
+a fair share of the cluster because each pool gets the same
+amount of resources. Within each pool you can use either
+fair share scheduling, so all the jobs belonging to one user can either share
+resources fairly, and with each other. Or you could use first in first out or
+first come first serve scheduling. FIFO, FCFS as you've seen before. This is also configurable, you can
+also configure what kind of scheduling algorithm you want to
+use within each pool. Some pools are specified,
+configured to have minimum shares. This is a minimum percentage of
+the cluster resources that that particular pool is guaranteed. When for a particular pool the minimum
+share has not been met for awhile, then you take resources away from the
+other pools, and you give it to this pool. And here, the Hadoop Fair Scheduler
+differs from the Hadoop Capacity Scheduler in how it takes over resources. It takes away the resources
+from a pool by, in fact,
+killing some of the tasks in that pool. In fact, it pre-empts the jobs
+in those pools by killing some of the currently-running tasks of
+those jobs in the pool from which it wants to take away resources. These tasks can be re-started later
+anyway, and these tasks are idempotent. By idempotent, I mean, that if you run
+the task multiple times on the same input, you're going to get the same output. There are no side effects of these tasks. So killing a task partway through, and then just re-starting it later
+on the original input is fine. It leads to some wasted work,
+but this wasted work can be minimized by picking as a victim to kill,
+some task which has started recently. So tasks that have only started recently
+are picked first to be killed, and then, if you need to kill more tasks, you kill
+tasks that started farther in the past. This again, minimizes the amount of wasted
+work because tasks that started recently have probably done just
+a little bit of work, and so, killing them will minimize
+the amount of wasted work. But it does result in some wasted work. That in some proposals since then from
+the research community that have proposed, in fact, saving the task state, and then relearning the tasks
+starting from their safe state. However, the Hadoop Fair Scheduler
+does not support that. A few other features in
+the Hadoop Fair Scheduler. You can also set limits on the number
+of concurrent jobs per user. A limit on the number of
+concurrent jobs per pool. The limit on the number of
+concurrent tasks per pool. All of this, prevents the cluster
+from being hogged by just one user or by just one job. It also prevents too many tasks or too
+many jobs of one user from competing for a small number of resources that are being
+allocated to that particular pool. So far, you have seen
+the Hadoop Capacity Scheduler, the Hadoop Fair Scheduler tend to use
+the FIFO or the first come first serve, first in first out approach, FIFO or FCFS. But as we have seen in the previous
+lecture in the series, FIFO is not necessarily optimal as
+far as completion time is concerned. And the question might
+be rising in your mind, why not use shortest
+trust task force instead? In fact that is optimal, right? As we know it. The challenge with Hadoop is that it's
+hard to estimate the expected running time of a task before the task
+is actually completed. So it's hard. So when tasks are generated by
+a Hadoop job, the tasks do not come specified with the exact time that
+the task is going to run for. And as a programmer you
+don't know that either. So a way to combat this,
+to address this and so that you can use algorithms like shortest-task-first
+is to estimate the task length. Okay, so
+a few approaches that can be used. So within a job you can calculate
+the running time of task or estimate the running time of a task as
+being proportion to the size of its input. So if one particular job with a one
+megabyte input took 20 seconds, sorry one task with a one megabyte
+input took 20 seconds to compute, another task with a two megabyte input,
+twice as high as the first task, will take 40 seconds to compute. You can also do
+the estimation across jobs, where you can calculate
+the running time of a task in a given job as the average of
+other tasks in that given job. So you can take the average running time
+across all the tasks in that job that have completed, and then based on that you can
+calculate the running time of a task. And then also, you can weight this by the
+input size of that particular task to get a more accurate running estimate. But of course, these are only estimates,
+and so they may not actually be true. And so, you may not actually get
+an optimal running time here, even though you're using shortest-task-first
+because the estimates may be off. There's been a lot of recent
+research results, and research work in this
+particular area here. So to wrap up our discussion of Hadoop
+Scheduling in YARN we have discussed two schedulers, Hadoop Capacity Scheduler
+which tends to be the default scheduler. And the Hadoop Fair Scheduler, which is
+used in a variety of different scenarios, and a variety of different
+Hadoop clusters. Yet so far in this lecture,
+and the previous lecture, we've only dropped one kind of resource. In the previous lecture, it was processor. In this lecture,
+it's predominantly memory. But typically,
+jobs such as VNs for instance, have a bunch of these source requirements. Some jobs may require,
+may have some CPU requirements, and also some memory requirements. And how do you handle this,
+we will discuss this in our next lecture.

@@ -1,0 +1,223 @@
+[MUSIC] Hi there,
+in this lecture we're going to see, the topic of Distributed Graph Processing. Which has come into prevalence in
+just the last few years in industry. So we'll see what distributed
+graph processing is. And we'll see a little bit of the overview
+of Google's Pregel system for distributed graph processing. Pregel is not an open source system,
+but Google has published a paper on it. And based on that paper several
+systems have been built, including Pregel-like systems. As well as much more advanced
+systems that are faster than Pregel. We won't get to discuss all
+of these systems in detail. But hopefully, this lecture will give
+you enough of an intro into the topic that you can go and look up these systems. If you are so interested. So what is a graph, first? A graph is not a plot. We are not talking of a graph as
+in a curve or a a series of dots. A graph instead is a network. And a graph like a network has vertices or
+nodes. For instance Facebook, the social
+network can be represented as a graph. Where each user is a vertex or a node. A graph also has edges. An edge connects a pair of vertices. For instance, in the Facebook graph
+an edge would be a friend relationship between say, you and one of your friends. That would be one edge. The friend relationship between you and a second friend would be a different,
+separate edge. And so, a graph consists of vertices and it consists of edges that
+join pairs of,uh, vertices. So there are lots of graphs around us. On the right, I have an example of
+a picture of a graph taken from Wikimedia. Here you'd see the vertices or nodes shown
+in red, and the edges shown in black. Joining a pairs of nodes. So there are graphs all around us. The Internet itself is a graph where
+the vertices are routers or switches. And the edges are actual links
+joining these routers or switches, links that actually
+carry packets and traffic. The World Wide Web can be,
+can be represented as graph. Where the vertices are webpages and
+the edges are URL links. Where one page points to another. So if you have a URL on one
+page pointing to another, that's an edge in
+the World Wide Web graph. Now, the World Wide Web graph is a special
+kind of graph known as a directed graph because edges are directed. A page A might point to a page B, that does not mean page
+B also points back to A. So edges actually have directions,
+they are unidirectional and so the World Wide Web graph is
+an example of a directed graph. Graphs were edges are bidirectional by
+default are known as undirected graphs. Social graphs such as Facebook,
+again an example of undirected graphs. Twitter is an example of a directed
+graph because you can follow someone and that doesn't mean they'll follow you back. LinkedIn is a dir, is an undirected graph as well
+because the, edges are bi-directional. Other graphs include the DNA interaction
+graphs, the Ecosystem graphs, chemical reaction graphics and
+a whole lot other graphs. So in, in fact in any area of science you
+can find graphs, you can draw graphs. And then,
+you want to make sense of these graphs. So graph processing operations try to
+derive properties from these graphs. They try to summarize
+graphs into statistics, so that you can understand what
+the graphs are telling you much better. For instance, you may want to find
+shortest paths between pairs of vertices. In the internet, graphs are useful for
+shortest path routing. So that your packets can
+get routed fairly quickly. In LinkedIn shortest paths is useful to
+find the degrees of separation between you and someone else. So if you've used LinkedIn you might
+notice that it says this is a first connection, or a second connection,
+or a third connection. That's a degrees of separation and that's obtained by running
+the shortest path algorithm. To see what is the distance
+between you and another user. What is the shortest distance
+between you and another user. In dating websites such as Match.com. Graph processing operations are used to
+find good matches between pairs of users. And there are many, many other examples of
+graph processing applications being used. So what's so challenging about this? Well one of the biggest challenges is
+that these graphs are very, very large. The human social network has hundreds
+of millions of, of vertices, and billions of edges. If you consider the the graph consisting
+of all the humans in the world, where every represents
+a human in the world. And edges represent a friends or
+relative relationships. Then that graph has 6 to
+7 billion vertices and many hundreds of billions of edges. The world wide web itself has
+millions of vertices and edges. So these are very very large graphs. They're so large that the entire graph
+cannot be stored on a single server for processing. Even if were to be stored on
+a single server it would be really, really slow on that server. Even if the server had many,
+many processors. So this is where the distributor, the
+cluster, or the cloud comes into action. Where you can use a large number of
+machines in a cloud infrastructure or in a data center. To process, a very large graph,
+very very quickly, and very efficiently. So what is a typical graph
+processing application look like? Here we are not talking of a typical
+graph processing application, we'll not keep talking of
+the distributed version of it. I'll talk about
+the distributed version soon. So, graph processing application
+works in iterations. So one iteration, a, leads to the next. Each vertex is assigned a value. At the beginning of the iteration, the
+value is some default value, like zero. Then in each iteration, each vertex in the graph gathers
+the values from its immediate neighbors. A, vertices who are,
+who are adjacent to it by a edge. So, for instance, at the vertex A here,
+shown in the figure. Its immediate neighboring
+vertices will be B, C, D, and E. Those are the vertices that
+join it directly with an edge. So A would obtain their values at
+the beginning of the iteration. So B would send its value to A. C would send its value to A. And D would send its value to A. And E would also send its value to A. Once it has all these values, A would then use its immediate neighbor
+values along with its own value. To compute its own new value. And then at the end of the iteration, it would send out it's new value
+to it's immediate neighbors. So it would send out it's value to B,
+C, D, and E. Then B, C, D, and
+E in this iteration they had also used the value of a to compute
+their own new values. And the next iteration again they'll use
+a new value of a to compute their own new values. So this series of steps,
+one, two, three, is done for every vertex in the graph
+during each iteration. So you keep doing this itteratively and,
+how many iterations do you have? Well, you can either have a fixed number
+of iterations after which the graph processing terminates. Or a the kind of application your
+running actually converges for example the shortest path. Algorithm is one of the algorithms
+that actually converges. Then after a while vertices
+will stop changing values. So they'll get values but the new value that you computed in the
+second step will be same as the old value. And if all the vertices in a given
+iteration do change values, then the computation has terminated. So in order to run this is a distributed
+system, can we use Hadoop? That is the first thought that we have. Well if you load this using
+Hadoop essentially we would have a multistage Hadoop. Where you would have one MapReduce
+phase for each iteration. So each MapReduce stage
+would be one iteration. So if you had 100 iterations you
+would have 100 chained Hadoop or MapReduce jobs after the other. You'll use the vertex IDs as
+the keys in the reduce phase. So that the information about a particular
+vertex would get routed to the same reduce task. Which would then use it to compute
+the new value for that vertex. This is attractive because of
+course Hadoop is well known. So it may be fairly straightforward to
+write this application up in Hadoop. But it's fairly inefficient. And the end of every stage,
+that is at the end of every iteration. You essentially are transferring all
+the vertices values over the network to the reduce task or
+almost all the vertices. And this can be very, very slow. Because essentially you're transferring
+the entire graph during each iteration over the network; that's really,
+really slow. Also, if you're using Hadoob,
+at the end of the reduce phase. The vertex values may be written to
+the HDFS, the distributed files system, and that makes it even slower. So, Hadoop may be easier to code up. But it's very very slow as far as
+the graph processing's concerned. And our, and our main reason for using a distributor infrastructure data
+center was to speed up graph processing. So what comes to our rescue is what is known as
+the Bulk Synchronous Parallel Model. Where essentially you have
+local competition being done at multiple processors parallelly. Here you think like a vertex. So each vertex is computed
+separately by a different processor. But at the end of iteration,
+all the processors meet a barrier. But all of them wait for all of the other
+processors to complete their iteration, and only then do they proceed
+into the next iteration. The BSP or Bulk Synchronous Parallel Model
+was originally proposed by Valiant. And that is what is used by many of
+the distributor graphing agents today. So in the basic distributed
+graph processing engines today, you think like a vertex. You assign each vertex to one server, so each server gets a subset of
+the vertices in the graph. Then in each iteration each server
+performs Gather-Apply-Scatter for each of its assigned vertices. For each of its vertices it gathers
+all its neighboring vertices' values. So for
+a given vertex that a server is assigned, it gets the values from the vertices. That are immediately joined
+to that vertex by an edge. Some of these vertices may
+be local at the server. Other vertices may be
+located on other servers, so you fetch their vertex
+values over the network. Then once you have these values you apply. In other words you compute this vertice's,
+vertex's new value using its old value and the values of its immediate
+neighboring vertices. And then you scatter. You send the new value over to
+these neighboring vertices. 'Kay, so this is really very similar to
+the three steps we had discussed earlier in the non-distributed
+version of graph processing. So here it makes a difference. What makes a difference here
+is which server you assign a given vertex to because this can
+reduce the amount of communication. If the neighboring vertices of a given
+vertex are in the same server as itself. Then essentially, you can fetch their values without
+involving any network overhead. So there's a couple of options in
+assigning servers to vertices, the first is Hash-based. Where you take the vertex id you hash
+it using a well known hash function and you then take modulo number of servers. And whatever value you get is a server
+number to which that vertex is assign to. Okay again this is random but it's consistent and
+this should be familiar to you. Because this is essentially consistent
+hashing as we discussed in P2P systems. And we discuss to be
+hash tables like card. Our second option is locality-based, where
+you assign vertices with more neighbors, to the same server as its neighbors. So a vortex, that has a very high number
+of neighbors is located on the same server, is assigned to the same
+server as its neighbors. And so, fetching the,
+those neighbor values, is, are just local operations and
+do not involve any network overhead. This reduces server to server
+communication volume at each iteration. Now the Pregel system by Google follows
+the Bulk Synchronous Parallel approach. And here is in a nutshell how it works. Pregel uses the master worker model. There is one master server. And there are multiple worker servers. These would also be master
+daemon the master daemons and the worker daemons running on
+each of the other servers. The master servers are responsible for maintaining the list of worker
+servers monitoring them. If any of them fail,
+then you need to restart them and reassign any failed
+vertices to newer servers. And the master also maintains
+a graphical user interface and a web UI for monitoring
+the progress of the other workers. The workers in turn are responsible for
+actually carrying out the gather apply scatter on the vertices
+that are assigned to them. And also for communicating with the other
+workers in fetching the values of the neighboring vertices where necessary. Typically in Pregel, the persistent data is stored as files
+on a distributed storage systems. Such as GFS in Pregel's Google or
+in the BigTable system. And temporary data is also
+stored on local disk. And it's stored on local disk
+because essentially after, if the worker crashes and then recovers. You want to be able to
+start where you left off. So how does a Pregel Execution proceed? Well first of all many copies of the
+program begin executing on the cluster. The worker daemon starts up, and
+the master daemon starts up. The master then assigns a portion of the
+input, that is a subset of the vertices, to each worker. Each worker loads the vertices
+from say the GFS or BigTable and marks these vertices as active. And then in each attrition the master
+instructs the all the workers to perform the iterations. So the worker loops through it's active
+vertices and computes a new value for each vertex. Based on it's old value and
+the neighbor values. The messages that contain the new vertex
+values can be sent any time during the iteration. But they need to be delivered
+before the iteration is done. That is before the buyer is
+reached by all the bonuses, by all the,
+servers at the end of the equation. When all the workers reach the,
+barrier divide iteration, then the master is informed about this. And ignores that all the workers
+finished this particular iteration. And then the master can move on
+to the next iteration and, see, repeat these three steps again for
+all the workers. When does a computation halt? Well, the computation halts
+when in some iteration, it's true that none of
+vertices are active. And all the vertices and markers are inactive meaning the values
+have not changed since the last iteration. And when no messages are in transit
+during the particular iteration. This means that the competition
+has terminated it has converged. There are going to be no more
+vertex value changes in the future. At this point of time, the master can
+instruct each worker to save its portion of the graph or its results. And you now have whatever values
+your application set out to compute. Whether they are shortest path values,
+whether they're values about, you know, matching, integrating graph. Or other values as far as your
+application is concerned. What about failures? How does Pregel handle failures? Well Pregel uses checkpointing. Periodically the master instructs
+the workers to save the state of their partitions to persistent storage. The state includes, the vertex values, edge values and
+any, messages that are in transit. And these checkpoints can then be used,
+to recover in the future. Ping based messages are used from
+the master to the worker for the master to keep track
+of the worker failures. If a worker fails, and
+then the master re-assigns, graph partitions to
+the currently available workers. So that every vertex is still
+assigned to one server. And then the worker all reload their
+partition state from the recent, from the most recent checkpoint. And then they start where they left off. So when you have a failure, essentially
+you might end up losing the value of the, work since the last checkpoint. If you're checkpointing at
+the end of every iteration. Then you'd lose at most one
+iterations worth of work. And you can start from
+the latest iteration. So how fast is Pregel? For the single shortest path or
+SSSP benchmark. On the 1 billion vertex graph,
+which is a tree graph. With 50 workers computing
+SSSP to 180 seconds,. With 800 workers, it took about
+20 seconds, which is pretty fast. When you see the size of the, a,
+graph, with 50 billion vertices, which is a pretty large graph. You know, the, the social, the human
+social network graph in the world would contain, a, about, not,
+no more than 70 billion vertices. So, 50 billion vertices, and 800 workers,
+this takes about 700 seconds, which is about 12 minutes which is,
+you know, pretty fast. So that wraps up our discussion
+of distributed graph processing. Graphs are all around us and
+large graphs are all around us. Whether they are internet graphs, World
+Wide Web graphs, or social network graphs. And we need to process these
+to make sense of them. Map Reduce is an attractive approach but
+it's not very fast. It's not, it's not very efficient. Instead we want to use distributed
+graph processing systems such as Pregel by Google. Or their offshoots including open
+source systems like Piccolo and Giraph, which are very much
+Pregel-like in their implementation. Or other systems that
+are much faster than Pregel, including GraphLab, PowerGraph,
+LFGraph, and X-Stream. These are systems that have come out of,
+research, projects in the last few years. And, some of these are open source. And they are being used increasingly,
+in order to process graphs in, clusters. [MUSIC]

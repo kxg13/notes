@@ -1,0 +1,311 @@
+[MUSIC] Hi there. In this lecture, we're going to
+see some very interesting and cool properties of networks or
+graphs as you have seen them. So before we get started,
+a few definitions again. What is a network or a graph? A network or
+a graph are synonyms by the way. So a network or
+a graph has vertices or nodes. For instance, in the Facebook graph,
+each user is a vertex. In the Internet graph,
+each router or switch is a vertex. There are edges that
+connect pairs of vertices. In the Facebook graph,
+a friend relationship between you and one of your friends is an edge. Similarly, in the Internet graph,
+the link joining to switches in the Internet
+constitute an edge in that graph. So there are networks of
+graphs all around us. The Internet of course is one of
+the largest networks that we use. The World Wide Web is a network
+where the vertices are webpages and the edges joining them are links that
+point from one web page to another. This is often called the directed graph
+as the edges are uni directional. They're also social networks such
+as Facebook, Twitter and LinkedIn, which are all networks where the users are
+vertices, and the friend relationships or the connections are edges. And of course a biological graph
+such as DNA interaction graphs, ecosystem graphs, and of course all
+of these are networks, as well. So there's a variety of networks and
+all these networks are fairly complex. They have different kinds of complexities. The first kind of complexity
+is structural complexity. For instance, the human social
+network has about 7 billion. That's a number of people alive in
+the world as of this year 2014. There are millions of
+computers on the Internet. The graphs, or the networks,
+as a result of these large numbers of vertices are also
+structurally very, very complex. These networks evolve over time. And they don't look the same now
+as they did one year ago, and they don't look the same now as
+they will one year from now. And this is because people
+make friends all the time. New people are born, people die,
+relationship change overtime. In the Internet,
+the ISPs change hands all the time, so the links on the Internet changes as well. And of course in the World Wide Web,
+as you know, new pages that are created as well as new edges and
+new links are added all the time. There's a lot of diversity even
+inside any one of these graphs. Inside the human social network for
+instance, some folks are more popular than others, so
+they might have more friends than others. In the World Wide Web, some websites
+may have many more links than others, they have many more links pointing
+to them than other websites do. For instance, the BBC website
+has many more links pointing to it than your or
+my personal homepage does, likely. And of course, the vertices in
+these networks are fairly complex. In the Internet graph,
+the endpoints, the routers and switches have different kinds of CPUs,
+they're running different kinds of OSs. And these OSs themselves
+have a lot of complexity. And of course human beings in
+the human social network are very complex individuals as well. And even though you might be able to
+represent each of these vertices by a few simple rules, when you put a large number
+of these vertices together in a network, you get some very complex,
+global behaviors. These are often called
+as emergent phenomena. So, even from simple end vertex behavior,
+and end edge behavior, which are governed by simple rules, you might
+get very complex system-wide behavior. One of the best examples
+of this is climate change. So, you could represent
+climate change as a network, where the weather is different
+points on the globe. And the edges are causatical
+relationships between them. And really we do understand all
+the basics of climate change, for instance, wind flows from high
+pressure to low pressure. The rainfall happens when there's
+lower pressure and so on and so forth. And yet, weather, it's kind of hard to
+predict, and that's precisely because it's an example of an emergent phenomenon where
+even though you know the simple rules, you aren't necessarily able to predict
+the emergent global behaviors when you put all of these tools together
+in a very large complex system. So, these networks have a lot of structure
+in the sense that many of these networks, you are able to reach one node
+from another in just a few hops. For instance, there is this well
+known myth, actually almost a fact, known as six degrees of Kevin Bacon. In this case, if you draw the actor graph,
+if you use the Internet Movie Database, IMDB, and if you represent each actor or
+actress by a vertex in the graph, and an edge joining two actors if those actors
+have acted together in at least one movie, then it can be shown that any actor
+can be reached from Kevin Bacon, the word extrapolated into
+Kevin Bacon within six hops. You can take just six jumps,
+one over each edge, and reach any actor from Kevin Bacon. Milgram, a researcher assigned
+to research at Stanford, did an experiment in the 1970s
+which showed that the human social network separates any pair of human
+beings with just a few edges. Typically, it's, again,
+only six degrees of separation, where there are an expected number
+of six hops between any two individuals in the world, no matter how
+far or how unrelated they happen to be. And so the actor network,
+the human network, and also other networks such as the World
+Wide Web, the human social networks that are in real online social networks such
+as Facebook, Twitter, and LinkedIn, peer-to-peer overlays,
+electric power grids, protein networks. A lot of these shared this
+common characteristics, where you can reach any node from any
+other node within just a few hops. Just six hops or so. So, why is this? We should be wondering why this is. And one of the common characteristics
+among all these networks is that they evolve naturally. It's not been the case that
+someone has come along and said, hey here's how the network is going to be,
+now and forever. Instead these networks started small and
+then they evolved over time. All of these,
+whether it's the World Wide Web, whether it's a human social network or
+whether it's the electric power grid, they evolved, whether it's evolution
+over a few years or over a few decades. And in the case of Facebook or
+in the case of the electric power grid, or as in the case of human social network,
+evolution over many, many centuries and millennia. A lot of these are small world networks. Here I'm introducing a new term,
+a very interesting and very popular term called
+small world networks. We need to see exactly what they are. Before we see small world networks, let's see two important matrix that
+we can use to characterize networks. They are called clustering coefficient and
+path length. Let's do the path length first. The path length is something that you've
+already seen so far in our discussion. Path length essentially is, if you take
+any pair of vertices in the graph, you take the shortest
+path in between them, the shortest number of vertices you need
+to jump from one to reach the other. That's the path length
+of that vertex pair. You calculate this path length for
+every pair of vertices and you take the average among them, that's
+the path length of the entire graph, or the average path length in that graph or
+network. So the longer the path length is, the more
+spread out the network is, in a sense. And the shorter the path length is,
+the more clustered the network is. But clustering is captured by a different
+metric, known as a clustering coefficient, also abbreviated as CC. This defines something like the following,
+given three word, this is A, B, and C. If there's an edge between A and C,
+given an edge between A and C, and given an edge between C and B. That is A and B are common neighbors at C. What is the probability that A and
+B are also connected to each other? In other words,
+C has two friends, A and B. What is the probability that C's two
+friends are also friends of each other? That is a clustering coefficient. This is a probability, so
+it has values between zero and one. If the values is zero, then it means essentially this is
+a very highly unclustered graph. For instance, tree networks have
+a clustering coefficient of zero. However, if it has a clustering
+coefficient of 1.0, the highest value possible, then it means
+that this is a highly clustered network. For instance, a complete graph where
+every vertex is joined every other vertex is an example of a graph that
+has a 1.0 clustering coefficient. But different graphs lie different points
+on the spectrum of clustering coefficient and path length. First, if you take the ring graph,
+the graph that you have seen when we discussed a peer to peer systems and
+distributed hash tables before. You did the ring graph and you add a few
+successors and predecessors to each vortex, you got a graph that has
+a very high clustering coefficient. Because if you have two neighbors, they're
+likely also to be neighbors of each other because they're likely to be successor and
+predecessor as well, but it has very long paths. If you have n vertices in your network,
+then the paths are on average n in length. On the other hand, if you draw a random
+graph where the edges are added between random pairs of vertices, this can
+be shown to have a very low clustering coefficient, but
+it has really short paths. So the paths in between any pair of
+orders are very short in general. So ideally, you know what we are used
+to in the human social network is high clustering coefficient. The fact that two of your friends are also
+likely to know each other, but also very short paths as we have discussed from
+Milgram's experiments and the 60 degrees of separation that you can reach any
+other human being within just a few hops. That is what is characterized
+by the small world networks, which have a high clustering
+coefficient and short paths. So, the reason I discuss
+the extended ring graph and the random graph is that you can actually
+show how to read some types of small world networks by using these
+two types of graphs. Specifically, you take an extended ring
+graph which has very structured edges and you take one edge at a time and
+you make their edge point to random notes. Okay, so you don't change the number of
+edges, but you take one edge at a time and make it point across
+random pairs of notes. What happens as a result of
+doing that is that, eventually, you have changed all the edges to being
+random, you get to a random graph, right? So, you go from an extended ring graph
+to a random graph, and a result, the clustering coefficient, which is
+very high for extended ring graphs, falls to very low for random graphs, and
+the path length also reaches very high for extended ring graphs also falls
+to be very low for random graphs. But these two things, the clustering
+coefficient and path length, don't fall at the same rate. In fact, the clustering
+coefficient falls much slower. It stays stable for much longer as
+you move from the ring graph to random graph while the path
+length falls very quickly. In other words, if you change just a few edges in your
+extended ring graph to be random edges, the path length falls very quickly because
+now a lot of the sharp paths will grow by these random edges because they join
+very disparate portions of the graph. So you get these region of networks in
+between the ring graphs and the random graphs which have a very high clustering
+coefficient as high as an extended ring graphs but have a very short path
+length almost has low as random graphs. And that is the region
+of small world networks. Once again, this is not all
+the small world networks that exist. This is one particular class of
+small world networks that exist. But essentially, this is a way of deriving
+small world networks which have this high clustering coefficient and short path
+length characteristic as we are used to in the separation and
+in the human social network. So small world networks are all around us. The network of actors is
+a small world network. The network of humans is
+a small world network. All online social networks
+such as Facebook, Twitter, LinkedIn are small world networks. Many of them have been shown by
+measurements to be small world networks. And the co-authorship network
+where vertices are researchers and edges between researchers, joint
+researchers have co-authored at least one paper together is an example
+of a small world network. In fact,
+there is number where that between a famous scientist and
+you in the correlation network. The worldwide Internet,
+all of these are examples of small word which have a very high coefficient,
+and yet have a very short. And many of these networks have
+grown incrementally, and in fact, they can be modeled by using
+a preferential model of growth where you add vertices sequentially or. When you add a vertex to a graph, you add
+some edges and you add from an existing vertex v with a probability proportional
+to the number of neighbors of v. So the number of neighbors of v
+already has is proportional to the probability with which v will
+be added to the newly added vertex. So if you use the you can actually show
+that you end up with small word networks. So we've discussed small world networks
+and we discussed it a little bit. Let's change that a little bit and
+we'll come back to small world networks. Let's change that a little bit and
+discuss degree. The degree of a given vertex in a graph or a network is essentially the number
+immediate one hop neighbors. So if a vertex has three edges,
+then its degree is three. So the degree distribution in a network or a graph is the probability
+that a given node has k edges. There are different kinds
+of degree distributions. You can have a regular graph where all the
+nodes have exactly identical degrees or Gaussian distribution. Or you can have a random
+graph with an exponential distribution where the probability that the vertex have k edges is e power minus k
+x c where c is a constant, some constant. And, of course, you have a power log graph
+which says that the probability that you have a k edges incident on you as
+a vertex is proportional to k power minus alpha where alpha is a constant. This is a very interesting distribution,
+because when k is pretty small, like one, two or three,
+this probability is very high. But as k increases,
+this probability drops off very quickly. So there's a very large number of
+vertices that have very low degrees, but there are a few vertices that
+have very high degrees as well. So how do you represent this? Well, this can be represented by
+what is known as the log plot. This is a well-known plot. Here, you represent the no degree
+on the exact sys, instead, what you plug is the logarithm
+of the node degree. So you notice that the values of node
+degree go exponentially up, 1, 10, 100, 1000, rather than 1, 10, 20, and 30. And on the Y axis, you plug the number of
+nodes that actually have that node degree. For instance, if the point is X
+axis equals 1 and Y axis equals 1M, it means 1M vertices in this graph. Each have a degree of one. Okay, so
+you plug this distribution function. Once again,
+the Y axis is also log as you notice here. It goes from 1, 100, 10000, 1M. And the power law graph, if you plug the
+degrees in for power law graph, it's going to be a straight downward-sloping line
+as shown by this green line over here. Okay, so a very large numbers. We have very small degrees in the top
+left portion of the curve but some also have very high degree and these are the high degree work
+presents in any power law graphs. The exponential graphs
+is not a straight line. It's curve at its head,
+the top left portion of the plot. And it's also curved at its tail,
+the bottom right portion of the plot. And also some distributions which
+are heavy tailed distributions which are straight downward sloping at
+their tail, the bottom right portion, but they are not necessarily heavy
+headed which is top left portion. Okay, so they're almost like power law
+graphs in the sense that they have some vertices that have a very high degree, but they don't have that many vertices with
+a low enough degree as a power law graphs. So this log node plot is the best way for
+you to distinguish when a particular graph, or when a particular network is
+either power law, or heavy tailed, or exponential, or something else. You draw the log node plot. If we'd just trade down your sloping line,
+it's the power law graph. If it has a heavy tail, if it has
+straight tail, that's heavy tailed. And otherwise,
+it is some other distribution. So a lot of small world networks
+are also power law graphs. For instance, the internet backbone graph,
+the telephone call graph, protein networks, the worldwide world
+graph is, in fact, a small-world graph. And also, power law graph has a value of
+alpha equals somewhere between 2.1 and 2.4, remember that. You have in our power
+law graph a degree of with probable deeper version
+of they key minus alpha. The Gnutella p2p system has
+a heavy-tailed degree distribution. It's not necessarily power law but
+it is heavy tail, so it has a straight downward sloping
+tail in the log log point. Power law networks are often called
+a scale-free networks, for instance, in Gnutella, you have about 3.4
+edges per vertex independent of the number of vertices that are present
+in your network or in your graph. But then, not all small world networks
+are power-law graphs and vice versa. For instance,
+co-authorship networks are small world but they're not necessarily power-law. And also,
+not all power-law graphs are small-world. You can generate power-law networks
+using the data distribution, where you have disconnected components of
+the graph, where they're not necessarily reachable from each other and so
+the graph is not a small-world network. But many small world networks are in fact
+power-law graphs as far as you find them in reality, and
+because a lot of these graphs, a small world and power-law,
+their resilience comes into question. Most nodes have a small
+degree in these graphs, but a few nodes have a very high
+degree in these graphs. So if you launch an attack on one of these
+graphs, if the attack is random, for instance, you kill a very large
+number of randomly chosen nodes, this will not disconnect the graph, okay? This is why attacking a power-law small
+world graph randomly is not really effective at all. But if you target some of these very
+high degree nodes in the power-law small world graph, this has a much higher
+chance of disconnecting the graph, okay? And this is essentially why,
+in the human body for instance, because the graph of proteins
+in the human body or chemicals in the human body is a small world
+network and also a power-law network, a few of the nutrients are very
+high degree nodes in the graph. So, essentially edges
+in this protein graph, edges are joined to chemicals
+that react with each other. And so some nutrients happen to
+have a much higher degree than other nutrients because they react with
+a lot of other chemicals in the body. And these nutrients are essentially,
+the vitamins in the human body, the minerals that the human body
+acquires like calcium and potassium. So, if you have a shortage of any of
+these vitamins or nutrients in your body, or minerals, your likely to be in trouble. But if you have a shortage of some
+of these other random chemicals that are there in your human body, then it's not likely that you're
+going to be affected all that much. Similarly, networks like the internet
+as well as the electric power grid, if you target a few high degree vertices,
+that's much more likely to disconnect the graph and cause a partition,
+and cause outages in the network. But if you target
+randomly chosen vertices, that's not likely to have any
+effect on the network itself. What about routing in these
+networks such as the Internet? If you build shortest-path routes
+between every pair of vertices, it turns out that in small-world
+power-law networks, most of these shortest-path routes will pass through
+some high-degree vertices in the graphs. So these high degree vertices get highly
+overloaded with these shortest paths and they're likely to suffer congestions and
+perhaps, in fact, even crash. As we have seen from the previous slide,
+if you disconnect some of these high-degree vertices, it's also
+likely that the entire graph would be disconnected and
+you might have an outage in the network. So this should tell you why there
+are these frequent outages in networks such as the internet, in
+networks such as the electric power grid. It's because these high-degree
+vertices suffer congestion and they might crash as a result of that,
+and because when they do, they disconnect large portions of
+the graph and end up having an outage. So in the internet, one of the solutions to this is to add
+some randomness in the path selection. You don't always prefer the shortest path,
+but you take some hops in your
+path that are random hops and this avoids going through the high
+degree vertices with some probability. And so the load in the high
+degree vertices reduces, they're less congested and
+they have a lower chance of crashing. To wrap up our discussion of structure of
+networks, the networks are all around us, both man-made networks, such as the
+internet, the World Wide Web and peer2peer networks, as well as natural networks
+that have evolved over centuries and millennias such as protein networks and
+the human social network. Yet a lot of these networks
+have common characteristics. Many of them are small world networks that
+have a very high clustering coefficient and very short path lengths. And there's also power-law where you have
+a very large number of vertices that have a small degree, but
+some vertices have very high degrees. And it's useful to know these
+characteristics because when you design distributed systems and distributed protocols that run over
+networks like the internet, that run over, that be with social networks
+such as online social networks. It's useful to know
+these characteristics so that you know exactly how your protocol
+is going to behave when it sends packets, when it sends messages over these
+networks, or when you run a graph processing algorithm that is
+dealing with such power-law graphs. So you can better predict how your
+distributed system is going to behave when it runs over small-world networks,
+such as the internet. [MUSIC]

@@ -1,0 +1,30 @@
+[MUSIC] All right,
+we have completed our deep dive and now we start to come
+back up to the surface. In these last three weeks of C3 Part 2, the remaining weeks, you will see topics
+that fall into one of three categories. These are topics that are either hot
+topics in cloud computing or orthogonal but related topics and also we'll see
+a few important classical concepts. In hot topics, our goal is not to explain
+the entire hot topic to you, but to get you jump started with a particular topic
+so that you have enough information to explore it by yourself either on the web
+or by trying out some of those systems. We'll see some orthogonal
+related topics as well, which are not necessarily disparate
+algorithms, but are related to distributed systems that are on the peripheries or
+interact with distributed systems. And so it's important for
+all distributed systems and cloud systems people to
+know what these topics are. And then we'll also see a few
+more important classical topics, which fall under core concepts. So in this week, week three, we'll seem
+some hot topics which include stream processing such as Apache Storm, we'll
+see distributed graph processing where you process very large graphs such as
+a Facebook graph or the web graph. In stream processing, we'll see how large
+amounts of data that are streaming, in such as a Twitter stream,
+are processed in real time. You see Apache Storm,
+which has been used for processing some of these new,
+some of these streaming data. Once again, our goal here is to get
+a jump start with these topics so that you can explore
+them later by yourself. In orthogonal topics, we'll see structure
+of networks, how networks look. Networks is not something
+that we study in this course, but they are of course something that
+distributed systems interact with. After all, a network is something that
+a distributed system sends and receives messages via, so it's important to know
+the characteristics of these networks so you can better design distributed systems. I would study a little bit of scheduling
+which is an important topic that is a core concept in distributed systems. [MUSIC]

@@ -1,0 +1,164 @@
+[MUSIC] So in this next series of lectures we're
+going to see the important topic of scheduling. In particular, today we're going to
+see single-processor scheduling. But let's start from a, a higher level. So why do you need scheduling at all? Well, many cloud computing system,
+you have multiple tasks to schedule. For instance, if we just consider your
+laptop or workstation or even your mobile device, there are multiple processes
+that are running on that device. On your laptop, you know,
+you have your browser running, your your editor running you,
+you maybe you have an IDE running. And essentially the operating
+system needs to schedule these processes across
+the limited resources that it has. Primarily the main resource is
+the processor or the CPU and if you have a single core OS or a single core machine, then you have a
+particular series of scheduling problems. And of course you might have a multicore
+machine where you might be able to schedule multiple
+processes simultaneously. But once again,
+typically the number of processes is much more than the number
+of processors that you have, the number of CPU that you have, and so
+scheduling here becomes a challenge. In a cloud computing cluster,
+you might have a Hadoop job running. And that Hadoop job has multiple tasks, so the cluster needs to decide where to
+schedule each task of the Hadoop job. You might have multiple Hadoop jobs,
+each with their own tasks. And that they might be competing for
+resources and now the cloud scheduler needs to decide where to schedule these different
+tasks of these different Hadoop jobs. You have a large number of tasks and there
+are limited resources that these tasks absolutely need so each task typically
+needs some amount of processing capacity, a processor some amount of memory, and of
+course it needs disk and network as well. But typically scheduling algorithms
+vary about processor and memory because these are the resources for
+where which there is most connection. There are two goals of
+scheduling algorithms. The first is to increase the throughput on the number
+of jobs you can execute per time unit. And related to that is
+releasing the response time or releasing the time that it takes
+one job to complete in your system. Essentially we'll just take into
+account the completion time of jobs. The second is high
+utilization of resources. You want your resource to be
+utilized as much as possible. You want your, all of your processors
+to be utilized 100% of the time, all of your memory to be
+utilized 100% of the time, so that you're making the most out of the
+resources that you invested your money in. So, let's look at single-processor
+scheduling in the lecture. So, you have just one processor
+in this particular problem and you might have multiple tasks that
+are trying to compete for these resources. In this example, I have three tasks. Task 1, Task 2, Task 3. Task 1 arrives at times 0. It has a running time of 10 time units. Task 2 arrives at time 6. It has a running of 5 time units. And Task 3 arrives at time 8. It has a running time of 3 time units. So you need to decide
+when to schedule these, each of these tasks at what
+time on the single processor. So one of the basic scheduling algorithm's
+is what is known as fi, FIFO, or first in first out. This is also known as FCFS or
+first come first serve. So in this algorithm you
+maintain the tasks in a queue, in the order in which the tasks arrive. So tasks that arrived earlier
+are ahead in the queue. Tasks that arrived later
+are later on in the queue. Whenever a processor is free, you de-queue
+the task at the head of the queue and you schedule it on the processor. So for instance, at 0 when Task 1 arrives,
+place it in the queue. It's the only task right now and so
+it executes until time inter, time time 6. At the point Task 2 arrives,
+it's placed in the queue, but then Task 1 is still executing on the processor so
+Task 1 is allowed to complete. At time 8 the Task 3 arrives and
+it's added to the queue but after Task 2. At time 10 when Task 1 finishes,
+the head of the queue is Task 2, so that's dequeued and
+it's scheduled on the processor. It runs until completion, which happens
+at time 15, at which time, once again, the header of the queue, which is Task 3 now, is dequeued
+as is scheduled on the processor. Task 3 finishes at time 18. So Task 1 finished at time 10. Task 2, which arrived second,
+finished at time 15. Task 3, which arrive,
+which arrived last, finished at time 15. This is the FIFO algorithm and
+even though, we are discussing it for a single processor now you're here, FIFO
+is in fact used by a variety of different cloud computing schedulers,
+including the Hadoop scheduler. So how about the performance of FIFO or
+FCFS? Well the average completion time,
+which is really what we care about, we want the completion time to be as small
+as possible may be kind of high for FIFO. For instance, for example, the average
+completion time can be calculated by adding the completion times for the three
+tasks and then divided, dividing them by 3, so that's 10 plus 15 plus 18 divided
+by 3, or 43 by 3, or 14.33 time units. This is not, this is on the higher side,
+I'm telling you. But, you know,
+can we do better than 14.33? What is another scheduling algorithm that
+is better, that does better than 14.33? Well that better scheduling algorithm
+is known as shortest task first. So in this particular approach, again
+you maintain all the tasks in a queue, but not in the order of arrival. Instead you maintain the the tasks
+in increasing order of running time. So tasks that are shorter are maintained
+towards the head of the queue and tasks that are longer are maintained
+at the tail of the queue. Whenever the processor is free,
+you de-queue the head task and you schedule it on the processor. So once again let's go to an example
+of your three tasks, Tasks 1, 2, and 3, with task lengths of 10, 5, and 3. The arrival times here are all zeros
+because I want to show you an example where the STF scheduling algorithm in
+fact has to make decisions among tasks. And so here on Task 3 which has the
+shortest length is chosen to run first. It starts running at time 0 and
+ends at time 3. At which point Task 2 which is
+the next shortest task is scheduled. It runs from time 3,
+finishes at time 8, and finally Task 1, the longest task is run
+from time 8 to time 18. So this is the shortest task
+first scheduling algorithm, STF, sometimes this is, this algorithm,
+is also known as SJF, or shortest job first scheduling algorithm,
+but we'll stick with STF because I want to maintain
+the uniformity of terminology here. So why does STF do better than FIFO? Well STF in fact that can be proved,
+formally proved, to create the shortest or the smallest average completion time among
+all possible scheduling approaches for a single processor system. So given a single processor system and a
+bunch of tasks that you need to schedule, among all the possible scheduling
+strategies that you might have, the STF strategy gives you
+the smallest average completion time. For instance, for our previous example,
+the, the average completion time of STF is the sum of the three completion times
+for the three tasks, divided by 3, which happens to be, 18 plus 8 plus 3, divided
+by 3, which is 29 by 3, which is 9.66. And this is much smaller than the
+completion time of 14.33 which we had for the FIFO/FCFS approach. The other nice thing
+about STF is that it is actually a special case of what
+is known as priority scheduling. In this particular STF scheduling
+approach, we sorted the tasks according to the running time, and in fact
+we treated the running time as a priority. But instead the priority might
+be specified by the user, for instance the user might specify a higher
+priority for interactive tasks that involve keyboard and mouse input, but a
+lower priority for background batch tasks that don't require any user input but
+have an output at the end of the long run. You always place the higher priority
+tasks at the head of the queue and whenever those tasks, I wanted to compute
+you let them run on the processor. A third scheduling algorithm is what is
+known as round-robin scheduling algorithm. In this case scheduling algorithm
+you allow tasks to be run in pieces or in chunks. In other words you split up a task into
+small quanta, and the quanta may be used as small time units as just say one
+time unit as in our example here. And you run only a portion of
+the task at the head of the queue. When that portion of the task
+is done you preempt that task. In other words you save the task of that,
+and the state of that task and then you add it add the task back
+again to the, to the end of the queue. You take the head of the queue task again,
+whatever task happens to be at the head of the queue, and then you start
+running that task at the processor. In order to run this again we
+need to bring back in the saved state of that task if it
+was preempted in the past. So again in our example, we go back to
+our example of three tasks, 1, 2 and 3 which arrive at times 0,
+6, and 8 respectively. So Task 1 arrives first,
+it's the only one so it's run so that it occupies the entire
+processor until time 6. At which point of time Task 2 arrives, and
+so Task 2 is now run for one time unit. And then when it's run for one time unit,
+it is put back at the end of the queue and Task 1 is allowed to run,
+at this point of time, Task 1 has run for 6 plus one 7 time units. Task 2 has run for only one time unit. Then at time 8, Task 3 arrives and
+now it is allowed to run for one time unit because it's at the head
+of the queue, now after it runs for one time unit it's put at the tail
+of the queue and now Task 1 and Task 2 are allowed to run,
+and then again Task 3. So this pattern repeats again. Then again you have other
+three tasks to run. And at this point of time,
+Task 1 is run for nine time units. You have 6 plus 3 greens, that's 9 greens. Task 2 is run for 3 time units. And Task 3, it has the blue ones,
+has run, has run for 3 time units. And units 1, 2, and 3. And so
+Task 3 is actually done at time 15, 'kay? So after this you have a Task 1 and
+Task 2 to cycle through, so you round-robin through them, and
+then this continues for a while. At this point of time actually Task
+1 is done at time extent of 17. Round-robin essentially gives
+a fair share of the resource, the processor, to all the tasks
+that are present in the system. So when do you prefer round-robin and when
+do you prefer shortest task first or FIFO? Well, round-robin is more preferable for
+interactive applications, applications that need, periodically
+need to, a, access to the processor so that they can run and
+process things like the keyboard input and the mouse input the and
+so on and so forth, 'kay? These are applications where the user
+needs quick responses from the system. On the other hand, FIFO or shortest
+tasks first is more preferable for batch applications where the user submits
+a job, goes away for a while, and comes back later on to get the result. For these you don't necessarily
+need to have applications that that run in quanta, but it can give
+them access to the CPU all at once. And in fact, there are many hybrid
+scheduling approaches that combine both the round-robin that we have seen and
+the FIFO/STF that we have seen, these are known as
+hierarchical approaches. So to wrap up our discussion of single
+processor schedule algorithms we've discussed only classical algorithms
+including FIFO/FCFS which schedules in the order of arrival. Shortest task first which
+schedules the smaller tasks first. And priority, which is a generalized case
+of the shortest task first scheduling where each task is scheduled in the order
+of the user specified priority. Also round-robin scheduling
+algorithm's which are well-matched for interactive applications where each
+task is given small shares to run. And of course this is only, this is only a
+sliver of the many scheduling algorithm's that are out there,
+which I encourage you to look up. We haven't discussed cloud scheduling yet,
+and that's what we're going to discuss
+in the next lecture in this series. [MUSIC]
