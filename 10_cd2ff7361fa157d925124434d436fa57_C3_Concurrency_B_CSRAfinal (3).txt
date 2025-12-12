@@ -1,0 +1,128 @@
+[MUSIC] In this lecture, we're going to discuss
+optimistic concurrency control, which tries to increase
+the level of concurrency or transactions per second compared to
+pessimistic concurrency control. And this is important
+because it improves revenue. It improves the operations per second and
+it lowers latency. And these are important in
+non-transactions systems. So systems like Dropbox,
+Google Apps, Wikipedia, Key-value Stores yh, Amazon's Dynamo. All of these even though they don't
+support transactions necessarily they prefer optimistic concurrency control
+approaches, because it reduces latency and increased concurrency. Meaning it,
+it improves operations per second. Optimistic concurrency control in
+general is preferable over pessimistic concurrency control when
+conflicts are expected to be rare. But when conflicts do occur,
+you need to make sure that they are caught and resolved if necessary. So the most basic approach to optimistic
+concurrency control is to just allow transactions. Were are going to be
+discussing the transaction version of optimistic concurrency control. You just allow transactions and
+clients to read and write objects at will. When the transaction tries to comment,
+you check for serial equivalence. If it's violated,
+then you abort the transaction and roll back in the updates that it made. Now an abort by transaction may
+result in other transactions that dread dirty data from this
+transaction also being aborted, because that data was never
+ever reflected based on a. Those were the transactions that read the
+dirty data by an aborted transaction you also need to abort. But those transactions may have written
+data, which may have been read by other transactions and those transactions now
+transitively also need to be aborted. As a result transaction aborts
+are a little bit tricky, because one transaction abort
+might lead to a series of other cascading aborts of other
+transactions as well. So a second approach that tries to improve
+on this is known as timestamp ordering. This is used by several databases. Each transaction is assigned an id
+that's called the transaction ID. The transaction id determines that, that transaction's position
+in the serialization order. So you want to make sure that you have
+a serial equivalents order that obeys a transaction id ordering. When a transaction t is used in operation, you need to make sure that
+two conditions are true. T's write to an object O is allowed,
+only if transactions that have previously read or written that
+object O had lower id's than T. Okay?
+That's the first condition that needs to be satisfied. Second condition is that if T
+is trying to read an object O, that is allowed only if O was last written
+by a transaction with a lower id than T. Okay.
+So, if these two conditions are, are satisfied, then you can ensure that
+the transactions, even though they interweave their operations follow the
+serialization order and then the resulting is serially equal aligned and
+the ordering is the serialization order. Typically, timestamp ordering is
+implemented by maintaining read and write time stamps for the object. And whenever any of these two rules is
+violated for a transactions operation, then that transaction is aborted. So this works with serial equivalence,
+but still you're resulting, you're still causing
+transactions to abort over here. Right? You don't have cascading aborts anymore
+here necessarily because the transaction only aborts and that's it. Or at least the trans the cascading
+aborts are minimized over here, because the transaction
+can still abort and other transactions can can be
+customized abort because of it. But the, the aborts are minimized
+compared to the previous approach that we discussed in the previous slide. But essentially, what I'm saying here
+is that you still have abort and you might want to do better than this. So third approach is known as
+multi-version concurrency control. This is used in several systems, including
+some key-value store systems like the. Here, for each object you maintain a per
+transaction version of the object. Right. And so each transaction maintains its
+own tentative version of that object. You also have a committed version,
+which is meeting on the server side, on the database side. Each tentative version has
+a timestamp of its own and the committed version
+also has a timestamp. Some variance some systems
+implement both read and write timestamp for the tentative version. Whether a transaction wants
+to do a read or a write, you need to find the correct tentative
+version to read or write from. And this correctness which is the correct
+version to choose from is based on the transaction id, so
+you want to make sure that you read only from transactions
+that were immediately previous writers. And so you choose your point in
+the transaction in, among the versions of that object and you choose the right
+version to read and write from. Okay. So this is only the sort of high
+level overview of multi-version concurrency control. We are not discussing its all
+its gory details over here. Now eventual consistency that
+we have seen in key-value stores is in fact a form of optimistic
+concurrency control. Cassandra key value store we have seen,
+in DynamoDB key-value store and also in the VF key-value store. But these systems are,
+not transaction systems. So the optimistic
+approach looks different. In fact,
+it looks slightly simpler in some ways. So, in Cassandra and DynamoDB, there's only one version of each
+data item, each key-value pair. That's what we would call an object. And you have a last-write-wins or
+last-writer-wins policy, which is LWW. Essentially, the timestamp, typically
+based on physical time is used to determine whether to
+overwrite the older value. If the new write's timestamp is higher,
+then the current object's timestamp, you overwrite. Otherwise, you do nothing and
+you ignore the that write. So ensures eventual consistency, which
+means that eventually you end write stop all, all the replicas will
+reflect the same value, which is the latest timestamp write. But you could have situations where
+a slightly older write with a fresher time stamp, because of unsynchronized
+clocks in a disable system. A slightly older write with a fresher
+timestamp might in fact win and so the last-writer-wins really is based
+on the notion as physical time and some notion of time
+synchronization across clients. A different approach used in the Riak
+key-value store uses vector clocks. And you should be familiar with
+vector clocks, because you've studied them in the first half of the course
+when we discussed lampo time stamps and then vector clocks. This notion implements causal ordering and
+these vector clocks are used to detect whether a new write is
+strictly newer than the current value. If the vector clock value
+is strictly greater than. Or if it's not compatible, then the new write might conflict
+with the old existing value. If there's a conflict,
+then you create a sibling value. Meaning you, you maintain for
+that key two values. Saying that these are two
+possible values for this key. These are sibling values. These are results, these need to
+be resolved at some point of time, they could be resolved by the user. You could bubble them up to the client or
+the user, which then picks one value and then does it right using that value and
+overwrites the existing values with a newer time stamp or it could
+result automatically by the application. So in any case, these are not
+resolved by the react system itself. They are pushed out to the client either
+by the user or by the application itself. The Riak uses vector clocks and
+the vector clocks might get very large, because the number of entries
+in the vector clock is potentially the same as
+the number of clients. And to do prevent a vector clock
+from getting too many entries, you you use sideways pruning,
+you typically prune the number of entries, the maximum number of entries that
+can be there in the vector clock. Also vector clocks might get very old, some entries might have very old
+items vector clock values in them. And so to prevent that from happening,
+you prune out you remove entries that have
+very old time stamps in them. So to wrap up our discussion of
+concurrency control we first discuss RPCs and RMIs, remote procedure calls and
+remote method invocations, which are important building blocks in
+understanding what transactions are. Transactions are one of the most
+important concepts in database systems that have been used for many decades. For transactions,
+you need to maintain asset properties and to maintain asset properties serial
+equivalence is a very important technique. And typically, this is detected and
+enforced by a conflicting operations. And there is two ways or two approaches in
+which you can do concurrency control, so that serial equivalence
+is still maintained. The first is pessimistic
+concurrency control such as locking which limits concurrency,
+but is always correct. Optimistic concurrency
+control lets transactions to proceed with their reads and
+writes under certain conditions. But checks later on or
+enforces checks at some point of time so that the asset properties and serial
+equivalence are in fact always obeyed. [MUSIC]

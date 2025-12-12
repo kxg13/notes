@@ -1,0 +1,163 @@
+[MUSIC] Continuing our discussion
+of replication control, in this lecture we will see
+an important technique for committing transactions in replication,
+in replicated systems. This is known as two-phase commit. In general, committing transactions is an
+important problem in replicated systems, and in general in systems where you
+have objects across distributed servers. So here's an example of a transaction
+that touches objects at multiple servers. Here in this case,
+we ignore replication for now. But let's just say each
+object has only one replica. So there is 26 objects here. There is 13 servers,
+each storing toward the objects. So server 1 Stores objects A and B. Servers two stores objects C and D. And so on and so forth. Server 13 stores objects Y and Z. The transaction T here
+writes to all these objects. When it reaches its commit point, we need to make sure that all
+of these servers are commit. So, when T tries to commit, we need to make sure that all
+the servers commit their updates. In this case, T will actually commit,
+the transaction T will commit. Or that none of these servers commit
+to their updates to their objects. In this case, T will abort. Okay.
+So this is an example of an all or nothing property here, which we want
+to guarantee for the transaction. But we also want to guarantee on
+the server side in a group of servers with distributed objects. This problem, obviously,
+should be familiar to you. This is, in fact, nothing but
+the consensus problem. In fact, in the concept of transactions, it's known as the atomic
+commit problem here. So, one way to do the atomic commit
+is known as one-phase commit. This is a first-cut naive approach
+where you have a coordinator server, say, a special server elected
+using lead election protocol. You are election protocol. The coordinator server is a special
+server that issues on the commit and simply tell the 13 servers involved here,
+hey, why don't you commit your object
+updates from transaction T? If something goes wrong on the transaction
+side, if the transaction T wants to abort, then it tells that
+coordinator server to abort. And it then, the coordinator server,
+then relays to the servers that they should abort their updates from
+transaction T to their objects. So what's a problem with this? Well, the first issue is that the server,
+the server storing the objects, the servers one through 13, have no say in
+whether the transaction commits or aborts. These servers are, after all, machines. So, they have the memory, and
+the memory might be corrupted. For instance,
+the object that they're storing, or the updates from that particular
+transaction may be corrupted. And in this case, you'll end up with
+an inconsistent system because, as far as the transaction T and
+the coordinator are concerned, they have wanted to commit but
+the server just cannot commit. It just cannot commit because it does not
+have all the necessary information there. Also, the server might crash before
+receiving the message that asks it commit. And in this case, the updates it had from transaction T
+might have been stored in memory and lost. And in this case, you, again, have
+a system where you have data being lost. So, to our rescue comes a two-phase commit
+protocol, which to this day is one of the most widely used protocols for
+committing transactions. Here, again,
+you have a coordinator server. Again, elected using
+a lead election protocol. And you have the remaining servers. As the name suggests,
+instead of using just one phase where the coordinator tells the server,
+server group, you have two phases here. So, the coordinator first sends
+a prepare message to the servers. The prepare message asks
+the servers to prepare to commit. When a server receives the prepare
+message, it saves the updates from that particular transaction to disk so
+that is durable now. And after this, if the server fails, it can then
+recover starting from this log on disk. Tthen, if everything is okay on the server
+side, it responds with a yes vote. If something went wrong, for
+instance, the memory got corrupted or it has lost its updates,
+it responds with a no vote. The coordinator server waits for
+these votes. If it receives any no vote, at least
+one no vote from any of the servers, it will then send out an abort
+message to all the servers. Okay?
+So, this ensures that, unless all the servers have voted yes,
+you will, in fact, end up aborting the entire transaction. Also, the coordinator server might not
+receive all the votes within a time out. If it does not receive all the votes
+within a time out, it also, again, sends an abort message to everyone. This is accounting for
+the case where a server might have failed, server 13 might have failed, and
+might never be able to send a vote back. And in this case, the coordinator must abort because
+it doesn't know what happened, what went wrong with server 13, and
+whether server 13 will ever come back up. Okay, so once again,
+in summary, if the coordinator server receives at least one no vote or
+it does not receive all the, in this case 13 votes, within the time
+out, it will send an abort message. However, if it receives all of the 13
+votes within the time out, it then sends out a commit message knowing that
+everything has gone right on the server sides, on the server side, and they have
+saved their updates to the log on disk. Once they have voted yes and no, they can't immediately go ahead and
+commit, right? So, if they voted yes, they can't really
+commit before receiving the next message. And so, they need to wait until the second
+phase commit message is received. When the commit message is received, they can then commit updates from disk to
+the store, to the actual database, and they can respond back with an
+acknowledgement back to the coordinator. When the coordinator receives
+all the acknowledgements, okay, it can then say that
+the two-phase commit is done. How do you handle failures and how do you
+make sure the correctness is guaranteed? So, first, if a server,
+one of the 13 servers in our case, voted a yes,
+it cannot unilaterally go ahead and commit the updates from the disk
+into the store or into the database. It needs to wait for the commit message. Why is this? Well, one of the other servers in
+the group might have voted a no or might have failed. In this case, the server might
+have to abort in the future. However, if a server votes no, meaning
+something has gone wrong on its site, if it votes no in the very first phase,
+then it can abort right away. Why is this? Well, this is because the coordinator
+would have received at least one no vote. And so, it would have decided
+an abort in the future. So no matter when that abort is decided, it will never be a commit because
+this server has voted a no. Okay, so, if a server votes no,
+it can go ahead and abort right away. But if a server votes yes, it needs to
+wait until the commit message is received. How do you deal with crashes? So, to deal with server crashes, each server saves the tentative
+updates into permanent storage, meaning disk, right before replying yes or
+no in the first phase. It can't save it after replying yes or
+no because it might fail right after replying yes or no,
+but before saving it on disk. It needs to save it on disk
+before replying yes or no. If it fails before this,
+before it saves it on disk, anyway the coordinator will time out
+waiting for the server's response and will abort the transaction. If it times out,
+if it crashes after saving it on disk but before replying yes or no, again,
+that's going to be an abort decision. If it crashes after saving it on disk and
+sending a yes vote, then it might be a commit decision, but at least it has all
+the necessary information saved on disc so that it can recover or achieve it after
+it's recovery, after it has rebooted. The coordinator might also crash. And so, to recover from these
+crashes the coordinator also logs all of it's decisions and
+the received and sent messages including counts of how
+many okay's it received on disk so that if it fails it can then recover and
+start where it left off. However things might go wrong and
+the coordinator might never come back up, so a new election might be required
+to elect a new coordinator. In this case, the coordinator might
+need to either start where the old two-phase commit left off
+by creating the servers, or just restart the two-phase
+commit altogether again. What about message losses? The messages that are sent out during
+the two-phase commit might also get lost. The prepare message, which is the first state message going
+out from the coordinator to the servers asking them to prepare to
+commit might get lost. Now, if the prepare message gets lost,
+then the server, one of the 13 servers, might decide to abort unilaterally
+after a timeout waiting for the first phase message. In this case, because it will
+never vote yes to the coordinator, the coordinator will always decide
+an abort for this particular transaction. Alternatively, to deal with prepare
+message loss you can have the coordinator send out a second prepare message. Now the yes no vote in the first phase,
+again, might get lost as well. If this gets lost, then the coordinator
+will end up aborting the transaction. This is tough luck. Even though everything might have gone
+right, everyone might have voted yes, just because the message, one of these
+yes votes was drawn by the network, you decide to abort the transaction. Yes, this is pessimistic. But at least it maintains correctness,
+it errs on the side of safety. And in this case, the coordinator,
+unless it receives all the votes, will decide to abort the transaction. Finally, the commit or abort message. The second-phase message might
+get lost in the network itself. And in this case, you're okay because the
+coordinator has already made a decision, it has logged the decision on disk. So, the server can poll
+the coordinator unless, if it has not received a decision in
+the second phase for what its decision is. Okay?
+So, it can poll it repeatedly until the coordinator comes back up and sends
+it either a comment or an abort message. So, a two-phase commit is used at
+the commit point in distributed servers. Another alternative to two-phased
+comment is, of course, a consensus solution such as Paxos. So Paxos is also being widely used
+nowadays, increasingly used nowadays, to decide whether to commit
+a transaction or not. Okay, but if you use Paxos, you need to
+make sure that if any server votes a no, then everyone will abort. That's the only catch in using Paxos. Paxos can also be used for ordering updates that are being
+received by replica groups. So, when a replica group receives multiple
+updates from multiple clients, you need to make sure that all the replicas
+receive the updates in the same order. This is, again, because in replicated
+state machines you want to make sure that all the replicas have the same series
+of states at the transition through, and the same series of outputs. So, in order to do this, essentially,
+the way you use Paxos is that a server, any one of the servers in the replica
+group, proposes a message for the next sequence number. So, one of the updates it has, it
+proposes it for the next sequence number. And then, the group either
+reaches consensus on this or not. If it doesn't,
+then another message is considered for the next sequence number, and
+you continue so on and so forth. Okay?
+So, this is the way in which Paxos is used to totally order
+updates within the group itself so that all the servers apply these updates
+in the same order as each other. So that wraps up our discussion
+of concurrency control and replication control. And for replication control, I've
+discussed the case where you have multiple servers, distributed servers in the cloud,
+which are either replicating objects for fault-tolerance or load-balancing
+objects across multiple servers with or without fault tolerance. Replication can be implemented using
+a couple of flavors, active replication, passive replication. And these can be implemented using
+concepts that we've learned earlier in the course, specifically, using flavors
+of multi-cast and virtual synchrony. And, finally, we have seen how to commit
+transactions when you have distributed servers in the Cloud. The two phase commit protocol is one of
+the most widely used protocols today. [MUSIC]

@@ -1,0 +1,196 @@
+[MUSIC] [COUGH] In this lecture we are going to
+see what transactions are, and what are some of the challenges in them. So essentially a transaction is
+a series of operations executed by a client on one side and
+a server on the other side, where each of the operations
+in the series is an RPC. However, RPCs have semantics of course,
+you know, as you have studied RPCs have at least
+once at most once, or other semantics. Transactions had a special
+requirement too. And this requirement is an all or
+nothing requirement. Essentially this means that, when a transaction completes
+it has one of two choices. One, either it commits all of its
+operations on the server-side. Which means that any of the updates
+that the transaction did, which means the client did
+during that transaction, are all reflected on
+the server-side objects. So all of the operations
+need to be reflective. The other choice is that, the transaction
+aborts, which essentially means, that none of the updates
+are reflected on the server-side. It's as if the server had never
+seen the transaction, at all. And so, essentially, the transaction can
+do whatever it wants during the execution. But when it comes time to commit,
+the transaction has one of two choices. Either commit, and deflect everything
+on the server-side, or abort, and deflect nothing. Transaction before we discuss,
+more about transactions. Here is an example of a sample transaction
+that might be done from a client that is trying to book a ticket on an air,
+on a, on a flight, to a server that is maintaining records of you know,
+flights and how many seats are there. So if you notice here, the first
+operation here is on the client side. This, this entire thing is a transaction. Of course, the first operation is that the
+client gets a transaction id by calling openTransaction, which is also an RPC
+from the client side to the server-side. Next, it gets the, flight availability for a particular site ru,
+of a particular flight run by airline ABC, flight number 123 on a particular date,
+in server.getFlightAvailability. This is an RPC. This value is an integer and
+it's stored in x. If x is greater than 0, meaning that are,
+there's at least one seat available on this flight, then it makes an update
+to that flight, by booking a ticket. This is another RPC. This changes a server state, so this is
+almost, this is essentially a write, or an update to the server state. This value is told in y. This is maybe, the ticket confirmation or
+something and then, once again the write is done, where
+a write is returned to the server-side, where a seat preference or
+an aisle preference is done. Is communicated to the server-side. Once this is done,
+now it comes crunch time, where a closed transaction is called by,
+the, transaction, and at this point the transaction must either commit all
+these operations, or abort all of them. In other words, the server,
+must at the end of this transaction, either have seen all the operations in
+that order, or none of them at all. So for our purposes some of these
+operations will be classified as reads and writes. The first operation where
+we got flight availability, where none of the servers state was
+changed, is a read operation from an object, where in this cas the object
+is a flight on that particular date. The next two operations
+where you book the ticket, as well as you put an an aisle
+preference are both write operations, or update operations because they
+change something on the server-side. They, they change server state. 'Kay, so it's essentially
+is write operations that we are most concerned about. We want, all these writes to be
+reflected on the server-side, or none of them to be reflected at all,
+at the end of the transaction. So transactions have as I mentioned
+before, some requirements. The most important requirement is the
+atomicity, requirement which is an all or nothing principle. This means that a transaction should
+either, complete successfully, so its effects are recorded conveniently
+on all server-side objects, or the transaction, has none of its effects
+recorded on the server-side objects. It's as if the transaction
+had never executed, at all. [NOISE] The second requirement comes from
+the fact that there might be multiple clients accessing the server. Imagine, you know,
+there might be thousands of, or hundreds of people, trying to book,
+seats on the same flight. So there are multiple clients and
+multiple transactions, that are concurrently trying to access, the
+same set of objects on the server-side. They are all, concurrently
+communicating with the server-side. So we also need isolation among
+transactions, in other words, we want a transaction to be indivisible,
+from the point of your other transactions. This all or nothing principle, which
+we talked about from the server-side, must also be true from one
+transaction to another. [NOISE] This means that, one transaction
+cannot have access to the intermediate results, or states of other transactions. Also, a transaction must
+be free from interference from operations of other transactions. Okay, so this is the isolation principle
+where, [NOISE] essentially even though the transactions are executing
+concurrently, the net result, the end result as far as the server state
+is concerned at the end of all of those transactions, is as if the transactions
+had executed one transaction at a time. They did not interfere with each other. They did not read each other's partial
+results, or intermediate results. So why is this challenging? Well, first of all the biggest
+challenge is that clients, may crash. The servers may also crash. And this means that, we need to have
+a way that preserves atomicity and isolation in spite of,
+failures in the system. Second, transactions
+could run concurrently. So, one easy way of, assuring
+isolation for instance, is to let, the server execute only
+one transaction at a time. But this serially limits the number
+of transactions that you can execute concurrently. Transactions per second, is a very
+important metric for most, systems, so, that they can, maximize their revenue. So, whether it's a banking servers,
+running on a bun, a bunch of bank servers, or whether it's an airline reservation
+servers, running on a bunch of servers. You want to maximize
+the transactions per second, because that maximizes revenue,
+it reduces the, latency for the clients. So you want to allow,
+as much concurrency as possible. You want to allow as many transactions
+concurrently as possible, and this is somewhat,
+at odds with the isolation principles. So you want to preserve isolation
+while still maximizing, the transactions per second. And so, this series of
+lectures concurrency control. We look at this problem, how do you,
+preserve isolation, and atomicity and all other requirements of transactions. While still,
+increasing the level of concurrency. Later on, we will see what happens,
+when you, replicate objects from the server-side,
+when you have, objects distributed out, out across multiple servers
+on the server-side. Okay, so that we'll see later on,
+when we discuss replication control. [NOISE] So, Atomicity and isolation
+are not the only two requirements, from transactions. Essentially, the requirements
+from transactions are, very nicely captured in an,
+ac, acronym known as ACID. Acid stands for, Atomicity,
+Consistency, Isolation, and Durability. [NOISE] Atomicity says, the all or
+nothing principle which we talked about. Consistency says that if the server starts
+in a consistent state, the transaction, must end the server in a consistent state. For instance for a banking transaction,
+you know, you, you'd, if you're transferring money from one
+bank account of yours to another. You want the total of those two bank
+accounts to be the same at the end of the transaction. That's an example of consistency. Isolation, as we talked about before, says
+that each transaction must be performed, without interference from other
+transactions, meaning that non final or intermediate, or partial results of a transaction,
+are not visible to other transactions. And finally durability, when
+a transaction does commit, and eh, and reflects its updates on the server-side,
+these updates must be held for eternity. No matter what happens on the server-side,
+these updates, must not be lost at all. They must be saved in permanent storage. So, why is this challenging at all? Well, it becomes challenging when you
+have multiple clients and one server. We are not considering, replication on
+the server-side or distribute services. There's only one server machine,
+and but we have multiple clients, each client executing a separate
+transaction, with that server. So, let's see a couple of
+examples of what could go wrong. [NOISE] The first thing that goes wrong,
+when you don't care for isolation, when you don't do anything about
+isolation, is a lost update problem. [NOISE] Here's an example
+of two transactions. The transactions are identical in code. But the way in which
+the transactions are shown, shows an interleaving of the operations
+of the two transactions. So let's look at one of these
+transactions, say Transaction T1. T1 gets the number of seats in
+a particular flight, ABC123. That's stored, that is stored into
+a local variable x, local at that client. If x is greater than 1,
+then x is decremented by 1, and the value of x is written
+to this server object, ABC123. Then the transaction tries to commit. Transaction T2 is identical. It has identical operations
+in the same order, but Transaction T2 starts
+slightly after Transaction T1. And so some of its operations are slightly
+delayed compared, to the T1 counterpart. So let's see what happens if, this
+particular interleaving as is shown in this slide, where Transaction T1
+executes its first operation first. Then Transaction T2 goes next,
+with its, first two operations. And then Transaction T1 goes,
+with its next three operations, and so on, and so forth. With this interleaving where
+time goes from top to bottom, let's see what, could go wrong. So let's say, initially, the server has
+10 seats available on this flight, so when Transaction T1 reads
+the number of seats from ABC123, the local variable at X is set to 10. Notice that this local variable x is
+a local variable at Transaction T1, and this local variable x,
+is a local variable at Transaction T2. So, you know,
+consider two separate processes, each with their own address spaces. Each has it's own variables. Then so these two, xs,
+x in T1 and x in T2, are not related, they're in completely,
+different address spaces. Say, and returning to our example,
+next, when, x gets T2, sorry, T2 gets x, soars into x,
+it also gets a value of ten, because, the, at the server-side
+the number of seats has not changed. Now, next what happens is that, because Transaction T1 sees that x is
+greater than 1, it decrements x by 1, and stores the resulting value,
+ten minus one, or 9, into ABC123. At this point, the server-side is
+reflecting the new value of 9. Okay. However, T2 is still working with
+this old value of x equals 10, and so, it decrements x by 1, to 9. And it also, stores that resulting
+value 9 into the server-side. Now, essentially, say the two transactions
+commit, what happens is that, on the server-side, the resulting number
+of seats is told as 9, rather than eight. Instead of having two
+different transactions, each of which booked one seat each,
+we've have had two transactions, each of which booked one seat each. But on the server-side only one
+of those seats was reflected. Okay, so this is what is known
+as the lost update problem. Either one of T2's or T1's updates is,
+is lost in this particular example. Okay, and the reason this happens
+is because we didn't really, make any effort at preserving
+the asset properties. Another example of what could go wrong,
+is, is here. This is known as the inconsistent
+retrieval problem. Here again, I have two transactions. These two transactions are different, and I'm showing an interleaving order for
+them. Let's see, each of these transactions. [NOISE] So Transaction T1,
+the one of the left, first gets seats from a flight ABC123. Then gets seats from
+a different flight ABC789. Stores them in variables x and
+y respectively. Again x and y are local variables at T1. [NOISE] Then it transfers 5
+seats from ABC123 to ABC789. It does so
+by simple writing x minus 5 to ABC123, and writing y plus 5 into ABC789,
+and then it commits. In the meantime, concurrently,
+Transaction T2 is trying to add up, or sum up the total number of
+flights available on, sorry, seats available on these two flights. So it gets the number of seats
+from ABC123, stores it into x, a local variable at T2. [NOISE] Similarly, it ABC789, and
+stores it into y, a local variable at T2. It adds both of them, and
+prints out the result and value. So let's see what could go wrong. [NOISE] So
+at the server is saying initially, the number of seats available on
+ABC123 is 10, and ABC789 is 15. 'Kay, so, really Transaction T2 should
+output a total value of 10 plus 15 or 25 seats at the end of this. That's the value that we would expect,
+right? [NOISE] Let's see what really happens, so, first, when transaction T1 executes its
+first three operations, it gets the values of 10 and 15, then it writes the value
+of 10 minus 5, or, 5 into ABC123. At this point,
+this on the server-side ABC123 is 5. Now Transaction T2 executes
+its getSeats ABC123. And it gets, x equals 5 because that's
+what is the value on the server-side, it gets y equals 15,
+that's unchanged from four. And when it adds these two,
+it prints out a total value of 20, 'kay? So, what really got lost
+in translation here? Was this 5 which was in transit
+in a sense, in Transaction T1. Where Transaction T2 read
+the partial results or the intermediate results or
+the dirty update, this write done by T1, was an intermediate result
+that was read by T2. And that is what read to
+the wrong result of 20, where the result should really have in 25. So this is what is known as
+an inconsistent retrieval problem, and this also arises because we
+didn't do anything special here, to guarantee asset properties. In the next lecture we'll see, mechanisms that prevent transactions
+from affecting each other, and that try to guarantee asset properties
+when you have, concurrent transactions and many concurrent transactions,
+executing with one server [MUSIC]

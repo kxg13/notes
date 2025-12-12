@@ -1,0 +1,201 @@
+[MUSIC] After having seen the concurrency control, you're going to see the replication
+control in this next series of lectures. Today, in this lecture
+we discuss replication. So, what's the difference
+between concurrency control and replication control? Well, concurrency control you use with
+the case where you have multiple clients executing operations or transactions
+with just one server on the other hand. So you have multiple clients and
+one server together. Replication control focuses
+on the server side, instead of just having one server,
+you have multiple, server machines. And the objects are now spread out
+over these multiple server machines. You may have five objects,
+which are stored, say, two objects at one machine and
+three objects at, another server. Or you may have these objects replicated,
+so each of these objects has say two
+replicas at each of those two servers. So we'll discuss both the cases with and without replication in
+this series of lectures. So why is replication important at all? Well first of all, replication means
+that an object has identical copies, each maintained by a separate server. These copies are typically
+called as replicas. I may use the term replica to also refer
+to not just the object copy itself, but also the server itself. If I say the replica server, I mean the server that is storing
+the replica of the object. So why is the replication important? Why is it important to have multiple
+identical copies of the same object? Well, there are a couple of reasons. The first reason is fault tolerance. If you're making k replicas of each
+object, you can tolerate up to, k minus one failures of any of
+the servers in the systems. So, if every object is replicated
+say k equals five times, then, your system, no matter how large it is,
+can tolerate up to four, k minus one failures of any of the servers, and
+still not lose any of these objects. And still be able to serve out reads and writes, to at least one of
+the copies of the objects. The second reason to do a, fault raw,
+to do replication is, load balancing. Essentially if you have, twice as many
+copies of your, of a given object then each of the copies faces only half the
+number of reads and writes that it does. So increasing the number of copies lowers
+the load on each of the copies by a factor of k, if you have k replicas
+compared to just one replica. In general the fault-tolerance
+requirement can be captured as a higher
+availability requirement. Eh, so let's calculate what availability
+really is, so if a server if any servers, say all the servers are identical,
+just for the purposes of this discussion. So if each server is down a fraction f of
+the time, f might be, you know, some small number like five percent or, 0.05,
+that's a server's failure probability. So if you don't have any
+replication where each object is stored on exactly one sever. Then the probability that the object
+is available is a probability that the server is up. Which is just one minus the servers
+failure probability or one minus f. Okay, so when you have k
+replicas the availability of the, of the object is a probability that at
+least one of the k replica servers is up, which is one minus the probability
+that all the replica servers are down. And that second probability, the
+probability that all the replica servers are down, is simply the failure
+probability of one server raised to the number of servers, or f to the power
+of k, so that's one minus f power k. Yes, so for those of you who
+know your math and property, you will notice as that K is higher,
+this number and one minus f power k, is actually much closer
+to one than one minus f. How close is it? Well, let's look at some real numbers. So, here's a table that shows you in the
+first column, the failure probability, f, so you have several sample values,
+0.1, 0.05, 0.01. These are the failure probabilities of a
+single server, and then the next column it shows what is the availability of
+the object when you have no replication, where exactly one copy of
+the object is made in. Essentially, this value is just one minus
+f, so one minus point one is point nine, which is 90%, and one minus .05 is .95,
+which is 95% and so on and so forth. With k equals three replicas,
+you can calculate the availability of the, of the object as one minus f power k. And that turns out, for f equals 0.1,
+it turns out to be 99.9%. This is often called as three nines
+of reliability because you have three nines over here, 99.9%. With f equals 0.05,
+the availability goes up because the silver\g failure
+probability here has gone down. So it's gone up to 99.9875 percent. When you have f equals 0.01, you actually
+end up having six nines of your elaboraty 99.9999 percent, so
+that's a much higher elaboraty. And, now, when you see nines
+of elaborately being offered in an industry product or
+in an industry service. And now you know what exactly it means,
+they are actually talking about availability percentages as
+we're talking about here. With a high number of replicas,
+you get a much higher availability. So just compare you know,
+when you have f equals 0.1 and you have k equals three replicas,
+you have three nines of reliability. But when you have k equals five replicas,
+you have five nines of reliability. Similarly with failure
+probability of f equals .01, with no replication you have
+two nines of reliability. With k equals three replicas you
+have six nines of reliability, and with k equals five replicas you
+have ten nines of reliability. You can actually tune the number of
+replicas you have based on the failure probability that you expect to get
+the desired reliability from your system. So, what's the catch? All this seems great right? I mean replication seems
+to give a lot of benefits. So, what is the hard part? Well, the hard part is to guarantee two
+properties replication transparency and replication consistency. Replication transparency essentially says
+that a client, any client should not be able to see that there are multiple copies
+or multiple replicas of a given object. So, as far as the client is concerned
+the replication should be invisible or transparent. That is the client should be able to
+execute operations just like there is just one copy of each object
+on the server side. The second application consistency is
+similar but it's slightly different. Here it talks about multiple clients
+seeing a consistent copy of the data, in spite of replication. So, in spite of the fact that the object
+is replicated, you want multiple clients to always, perform operations as if
+there is only one copy of the data. And whenever a client updates or
+writes that the object, any replica of the object, all other
+replicas get updated if possible, instantly, and if not instantly
+at least as quickly as possible. So that before the next client
+performs its operation, all the replicas are up to date. Replication consistency means something
+stronger when you have transactions. Essentially means that you guarantee
+the acid properties, which is adomicity, consistency, isolation, and durability that you've seen earlier in
+our discussion on concurrency control. So how do you provide
+replication transparency? Well, typically you provide
+it using front ends. So you have multiple clients
+think of these as for instance the clients accessing flight,
+a flight reservation database. The replicas are storing information about
+the objects, such as the flights, and you have a few front end servers. These might be front end servers
+maintained at the data center or they might be front end servers maintained
+at a content distribution network, CDN, or some series of proxy servers or
+cash servers. Essentially the clients only
+talk to the front end, so they don't see any replica groups or
+any replicas of the objects. And the front end of them responsible for forwarding their requests to
+the corresponding replica objects. Here I have an object oh that has
+three replicas marked as replica one, replica two, and replica three. Whenever front end receives
+a request from the client it then forwards
+the request to the replica. And the replies come back from
+the replica group to the front end and then back to the client
+along the reverse path. Well what about replication consistency? Well there's two flavors to
+providing replication consistency. They are known as passive replication and
+active replication. In passive replication we
+use a primary replica, also known as a master, or a leader. In after-in active replication
+there is no leader, instead we use a fully distributed
+approach among the replicas. We'll discuss each of these
+approaches in the next few slides but both of these approaches use the concept
+of replicated state machine. Well a state machine
+some of you might know, is essentially a program or
+a series or, or a, or a code which, when given a series of
+inputs gives us the use of outputs. But for each input the internal state of
+the state machine might change as well. So essentially, typically you have
+a graph involving, states and transition, rules in between,
+pairs of states. And whenever you receive
+an input you have an output, but you will also transition, the state
+machine from one state to another. Essentially replicated state
+machine says that all the replicas of the given object are running the same
+state machine or the same code. And when they're given an,
+an identical series or an identical sequence of inputs at each
+of those replicated State Machines, the series of states that those
+State Machines go through is identical. Also, the series of
+outputs is also identical. Fred Schneider, in 1990,
+formalized this as follows. He said that,
+replicated state machines refer to, multiple copies of the same state
+machine begun in the start state, and receiving the same inputs in the same
+order, will arrive at the same state, final state, having generated
+the same series of outputs. And so that's,
+essentially a replicated state machine. So now let's look at a passive
+replication and an active replication. So in passive replication, the group
+of replicas of object O elects one of, the replicas as a master or a leader. And for this it uses one of our
+leader election protocols that you have seen earlier in the course. The front end's the variable
+that receive an ob, a read or a write, they relay the operation
+directly, to the master. And this ensures that for writes there
+is a total ordering of all the writes or all, or, of all the updates. For reads,
+some variance of passive replication allow the front ends to contact any
+of the three replicas for the reads. And some other flavors of
+passive replication directly reads as well through the master. As far as writes are concerned, they need to go through the master,
+because the master then sends out the corresponding writes to
+the other replicas inside the group. What happens when the master fails? Well, when the master fails, you again
+run your leader election protocol. Whatever is your favorite leader election
+protocol, and you elect a new master. In comparison to passive replication, active replication does not
+use a master or a leader. Instead, each of the front ends
+multicasts out the request, read or write to the entire replica group. Okay, so for this you can use
+your own favorite multicast protocol that you've seen
+earlier in the course. So the red arrows over here show
+a multicast in, inside the replica group. Now as you know, multicasts come in different flavors
+especially ordering flavors. So you can use any flavor of multicast
+ordering depending on the application and you have seen earlier in the course,
+flavoring. The flavors of ordering that are available
+to you are FIFO ordering, causal ordering, total ordering, and hybrid ordering among
+these two, among you know these three. So, if you use a total or
+hybrid auditing with total, for some form of total ordering, along
+with the replicate and state machines. Essentially means that all
+the replicas are going to receive the same series of operations
+in the same order. And that means the series of
+states that transition through and the seats of outputs that they will output
+will all be identical at all the replicas. It may not happen at the same instance of
+physical time at all the replicas, but at least the ordering is the same. So what about failures? How do you incorporate
+failures into this multicasts? Once again, as we have seen before
+in our discussion of multicasts, you can use the concept or
+abstraction known as virtual synchrony or view synchrony, which orders failures,
+along with multicasts within the group. So if you use virtual synchrony
+with total ordering for multicasts, essentially all the replicas
+see all the membership changes, failures, joins or leaves in the same order. And also the multicasts in the same order,
+and both of them, multicasts and fi-, and
+the membership changes in the same order. Now you can use total ordering here. If your application is okay with
+a slightly weaker form of ordering, which is causal ordering,
+that might be fine, you can use that, too. Or even FIFO ordering if your application
+is willing to live with that. What do you do with transactions
+when you have replicated systems? Well, there is this concept
+known as one copy serializable. Just like we studied serial
+equivalence for transactions when we started concurrent congruency
+control, in replication control for transactions there is a concept
+known as one copy-serializability. What does it say? It says the following. A concurrent execution of transactions
+in a replicated database is one-copy-serializable. So when I say concurrent
+execution of transactions, I'm talking about multiple
+clients executing transactions. Replicated database means that objects
+have multiple replicas on the server side. So it's one copy serializable if it
+is equivalent to a serial execution, but as a serial it means
+a serial equivalence, all right? Execution of these transactions over
+a single logical copy of the database. Okay, so it's as if you executed
+these transactions one at a time over a database where there were, where
+there was exactly one copy of each object. Okay, in other words this is the same that
+the effect of the transactions performed by the clients should be the same as if
+they had been performed one at a time on a single set of objects that
+is one replica per object. Okay, so this essentially means serial
+equivalents of the transactions, right, so that's what we're talking about here,
+okay? So we want to have both serial equivalents
+and one copy serializability, and one copy copy serializability appears to capture
+this serial equivalence notion as well. So after this let's discuss how you
+commit transactions when you have distributed servers on the sever side. [MUSIC]

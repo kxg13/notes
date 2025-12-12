@@ -1,0 +1,199 @@
+[MUSIC] In this lecture we will see the first of
+two types of techniques that are used for concurrency control, in other words, to make sure that transactions satisfy the
+asset properties in spite of concurrency. So, these two approaches
+are pessimistic concurrency control and optimistic concurrency control, okay? So, pessimistic, a pessimistic, approach,
+or pessimistic approaches assume the worst, and they prevent transactions
+from accessing, the same objects. So they prevent two transactions from
+accessing the same object altogether. An example of pessimistic that we'll
+discuss in more detail is locking. Optimistic approaches on
+the other hand assume the best and they allow transactions to proceed as if,
+you know, there are no conflicts that are occurring and as if
+they would not interfere with each other. But at late, at a later point of time
+the optimistic approach checks whether or not the asset is satisfied and
+if it's not then it need to, abort. So multi-version and time-stamp
+approaches which we'll discuss later on, all fall under the optimistic approaches. First pessimistic approach that we'll
+discuss is known as exclusive locking. This is the simplest and the easiest. Each object is associated with a lock. And at most one transaction
+can be inside a lock. When a transaction T wants to access an
+object O, either for reading or writing. It needs to make sure that it cause,
+lock, the lock(O) function. And the lock(O) will block if there is at
+least one transaction inside the lock. When that transaction,
+leaves the lock by calling on lock(O), then another transaction is allowed in. This ensures that, at most, one transaction has access
+to the object O at any point in time. However once an object once a transaction
+t has locked an object though it can then read and
+write the object mold multiple times, it doesn't need to call lock every,
+every time. So it can lock the,
+lock the object once at its beginning and then do all its accesses and
+then unlock it at its end. This should sound familiar to you because
+this is very similar to the mission exclusion problem and
+solution that we discussed earlier. In fact, you could use any of
+those techniques here to implement exclusive locking. Okay, but that's going to add to what
+we're discussing here because we are at the semantic level, or
+the level of transactions over here. So once again concurrency's important
+here because it means more transactions per second, and
+it means more revenues for whoever, whichever is the company
+running the server site. And exclusive locking has the problem
+that it reduces concurrency, essentially. You know, you're, you're, you're, you're,
+you're only limiting transactions to read so that plus one transaction
+can read any object. In real life workloads
+have a lot of read-only or read mostly transactions where
+most of the operations are reads. And even there the exclusive
+locking approach is, limiting these transactions to, read the
+objects only one transaction at a time. But this is kind of not required,
+because reads can read on concurrently, as you've already seen. Read, read conflicts in the same object
+are really not conflicts at all, because they re, they return the same values no matter what
+order they're op, they're executed in. So the hint again or the key here as we go
+forward to the next approach is that it's okay to allow two transactions
+to concurrently read an object Because read-read is
+not a conflicting pair. But when writes come in you
+need to be more careful. Okay, so that's the next approach which allows two different types
+of locks on an object. Or rather the lock on an object can
+be held in two different modes, the read mode or the write mode. As long as an a transaction is
+holding an object in read mode, other transactions can also hold the lock
+on the object in the same read mode. Which means that multiple transactions
+can be allowed to be in the read mode. However when any transaction
+is in the write mode,. No other transaction can be allowed in
+either read mode or the write mode. This means that this is an exclusive lock. So, the operation is given out as follows. Before a transaction T
+reads an object post, as opposed to reading an object code,
+it calls read lock on both. The transaction T is allowed in if all
+the other transactions that are inside the lock all are in
+the read mode currently. If any transaction is in the write mode,
+then T will have to wait. Now what does T do before
+it writes object O? So it calls write_lock(O). Once again, write_lock succeeds our, the
+transaction T is allowed past it if and only if no other transaction is
+currently accessing the object, O, meaning it has not locked object O. If T already holds a read lock on object
+O and it wants to now write object O, it can simply call write lock to
+promote its lock from the read mode to the write mode, okay? Once again this succeeds only if no
+other transactions are currently, in the, read mode or
+in the write mode, okay? So both of these need to be true. Otherwise the promotion will block,
+and T will block. Finally, when unlock is called
+on the log by a transaction T, it releases all a locks,
+no matter what modes they're in. So how do you get a serial
+equivalence with these locks? That's, that's the whole goal, right? We want to make sure that asset
+properties are satisfied and so. Therefore satisfied when, when
+the serial equivalence is satisfied, but how do you ensure that the serial
+equivalence is in fact satisfied? So, two phase locking is a very
+popular technique that's used, to guarantee serial equivalence. Essentially two phase locking says
+that a transaction can not acquire or promote any more locks after it
+has started releasing locks. Essentially it says that
+the transaction has two phases. The growing phase, where it only
+acquires or promotes locks, and then a shrinking phase,
+where it starts releasing locks. And once it starts releasing locks it
+cannot acquire or promote any more locks. Okay, so that's two phase locking. You have a growing phase where you acquire
+or promote locks, and then once you have gone, once you're done with that you have
+a shrinking phase where you release locks. We research, we are talking of phases, these are phases that would occur inside
+the transaction operations themselves, so each transaction has these phases
+while it's executing its operations. There is a variant of two phase locking
+known as strict two phase locking, where there is no shrinking phase, instead you release the locks only
+when you reach the commit point. Okay, so there is the releasing of
+the locks occurs only at one point, the commit point of the transaction. So, why does two phase locking, as we've discussed it,
+guarantees serial equivalence? Well, the proof is by contradiction,
+here is the proof. Assume we have a two phase locking system
+where serial equivalence is violated for two transactions, T1 and T2. Because of the serial equivalence
+definition, it must be true that there is some object O1,
+where the conflicting operations in T1 and T2 are such that the tag on that
+conflicting pair is T1 comma T2. And there's some object or two, maybe
+the same object or one, maybe a different object where the conflicting operation
+pair is the reverse, which is T2 comma T1. Now, because of the first T1 and
+T2 pair and because of the way the two phase
+locking works, the shrinking phase, or the growing phase first and
+then the shrinking phase. T1 must have released O1's lock
+in it's shrinking phase, and then T2 acquired the lock after that. Which means that T1's shrinking
+phase is either before or overlaps with T2's growing phase, okay? That's just by definitions. But, then using the same
+argument on B we can, we can argue that T2's shrinking phase, is before
+or overlaps with T1's growing phase. However this cannot be true,
+because you can't have both of these statements be true,
+because growing phase only occurs before the shrinking phase in each transaction,
+and that is the contradiction over here. So one of the downsides of
+locking is deadlocks and so here is an example of a deadlock. So here are two transactions, T1 and T2,
+they are trying to do similar things, but in slightly different orders. So, T1 is locking the object ABC123,
+and then, it's writing to it, and then, it tries to lock object ABC789. T2, on the other hand,
+locks the objects in a different order. It locks ABC789 first, and
+then it tries to lock ABC123. And this is the interweaving
+of these two transactions. Essentially, at this point,
+Transaction T1 is trying to lock ABC789, it ends up waiting for Transaction T2
+to release it's lock on ABC789. While here T2 ends up waiting for, the lock on ABC123 which is
+currently being held by T1. At this point the transactions T1 and T2 are deadlocked,
+each of them is waiting for the other. Okay, so this is shown by this wait for
+graph where T1 is waiting for T2 to release the lock on object ABC789, and T2 is waiting for
+T1 to release the lock on object ABC123. Okay, this is an example for
+deadlock where these transactions T1 and T2 will not make anymore progress ever
+at all unless you do something about it. Okay so deadlocks can happen in any
+system that uses a locking approach. So when do deadlocks occur? There are three necessary conditions for
+a deadlock to occur. When I say necessary, I mean that there is
+a deadlock on the system, then these all, then these conditions are all
+definitely true, okay? So these three conditions are as follows. Some objects are accessed in an exclusive,
+an exclusive lock mode. Which means that when
+a transaction accesses, some objects,
+those objects are accessed so that no other transaction can access those
+objects, so these are exclusive lock mode. For instance a right mode
+is an exclusive lock mode. Second condition is that a transaction
+holding a lock cannot be preempted. Okay, so a transaction doesn't necessarily
+just give up its locks just like that. And third, most importantly,
+there is a circular wait or cycle in the wait-for graph
+that we have discussed. Okay, so we discussed a wait-for graph for
+two transactions, but when you have thousands of transactions
+involved, and transactions are waiting for each other to release locks. We can draw a wait for
+graph among these transactions. If there's a cycle in the wait for
+graph or a circle of, directed edges, then, you have a cycle and
+you have a deadlock in the system. So, once again,
+these conditions are all necessary, which means that if there's a deadlock
+then these conditions are definitely true, however, they're not sufficient. If these conditions are true, it doesn't
+guarantee that there is a deadlock, okay? It doesn't mean there is
+definitely a deadlock, okay? So the sufficiency is not true,
+the necessary is, is true. So how do you combat these deadlocks? Well, there is a few approaches
+the first approach is lock timeout. When a transaction is not able to access
+a lock for a while, it times out and it aborts the transaction. This could be expensive, of course,
+once it locks, of course. It's expensive because transaction
+aborts might become very frequent, and timeouts may occur even
+when there's no deadlock. Because you know, the network might
+just be slow, and transactions might be aborting just because they are facing
+timeouts because of slow network. So different approaches to deadlock
+detection, where you allow deadlocks to happen but you detect
+the deadlocks when they do happen. Essentially here you keep track
+of the wait-for graph for instance you keep track of it via
+the global snapshot algorithm. You might recall the chandy lamport
+algorithm which we discussed at the very beginning of this class, this course. And you could use a churney lampored
+algorithm global times rather than to capture the wait for graph and
+then detect cycles in it. Okay, for
+instance you could do this periodically. If you do find a cycle, then you need to
+abort one or more transactions in that cycle to break that cycle, and to ensure
+that there is no deadlock in the system. However, this still allows
+deadlocks to occur. So a transaction might still end up
+waiting when they're in a deadlock before the next Global snapshot
+algorithm is run and cycle is broken. So, a third approach that comes
+in is deadlock prevention, which completely prevents deadlocks by
+violating one of the necessary conditions. Note that we said necessary conditions, means that these conditions are absolutely
+required for deadlock structures. If you violate any one of
+the necessary conditions, just one of them, is violated, that's
+sufficient for you to, that's enough for you to ensure that deadlock
+will not happen in the system. For instance, the first condition said
+that some objects are accessed in exclusive lock modes. This can be violated by ensuring,
+for instance, that all objects are accessed in read-only modes, meaning
+you don't have any exclusive locks. So in a database where all ob, where
+objects cannot be written at all, where objects can only be read, you can never
+have deadlocks because the first condition is violated, the first necessary condition
+is violated and it is never true. Let's go the next condition. Next condition says the transactions
+holding locks cannot be preempted. Well, you can allow transactions to be
+preempted, all transactions too, for instance, time out when
+they're waiting for locks. Again, this would prevent
+deadlocks from happening. The third condition says that there is a
+circular wait in the wait-for graph, okay? So this can be implemented
+by the following approach. There are many other approaches that can
+be used too, to violate this condition but here is one condition, one approach. A transaction locks all the subjects, all
+the subjects in the beginning, so it knows all the objects that it is going to lock
+up front at its open transaction time. And it tries to lock all
+of them at the beginning, if all these locks succeed then it
+proceeds, then the transaction proceeds. If any one of these, if at least
+one of these lock attempts fails, then the transaction aborts immediately,
+okay? Because in this approach a transaction
+hour waits for other transactions to release the locks because either you
+access all your locks or you don't. You never have any edges in
+your wait-for graph, and so you don't have any cycles
+in your wait-for graph. Because if you don't have any edges,
+you don't have any cycles. And so this approach would end
+up preventing deadlocks as well. So we discussed the pessimistic
+concurrency control approach we'd use as locks, but it's still limiting, right? There, there are still times when some
+transactions are having to wait for other transactions if
+you still use locking. And so concurrency is still not as
+high as we would want it to be. And you can make it even higher by
+using Optimistic Concurrency Control, which we'll discuss in the next lecture. [MUSIC]

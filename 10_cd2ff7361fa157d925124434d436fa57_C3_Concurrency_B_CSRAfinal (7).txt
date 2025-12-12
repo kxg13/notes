@@ -1,0 +1,233 @@
+[MUSIC] In the topic of concurrency control,
+which the next lecture series focuses on one of the most
+important building blocks is RPCs. So in this lecture we'll
+see what an RPC is, and how RPCs are implemented in systems today. RPC stands for Remote Procedure Call. And it was proposed by Birrell and
+Nelson in the early 1980s. They wrote a paper about it but
+it's not just limited to a paper, it's an important abstraction that is
+implemented in many distributed systems today and
+most cloud computing systems, not all. RPCs are an important
+abstraction that allow processes to call functions in other processes. So, if you have function in a process P1,
+another function in a process P2 normally you would not be able to
+call one function from the other, from the other but
+RPCs allow you to do this. As a result, RPC is enable a code reuse. So if someone writes for instance
+a library for a special data structure, then you can call the functions
+of the library by using RPCs. RPCs stand for remote procedure call. They have a counterpart in object based
+systems, known as RMIs, which transfer remote method invocation, where one
+method is called from another method. So before we discuss what an RPC is, we need to discuss what a local
+procedure call is, or and LPC is. In a local procedure call you
+have a calling function and a called function, and both these
+functions share the same address space. They lie within the same process. This means that the stack of that process, because the process has only one stack,
+the, the stack can be used to pass arguments from the calling
+function to the call function. When the call function is done, it can then pass the return values
+back along the stack again. Also, because these functions share
+the same process address space, they can access common objects. Example via pointers if you're using C. Or by reference, for instance,
+if you're using Java. Now LPCs, or local procedure calls,
+have exactly-once semantics. This means that as long as the process
+which contains the two functions does not crash the call function
+will be executed exactly once. Not zero times, not more than one time,
+but exactly one time. And this is important to discuss here,
+because when we discuss RPCs you'll see that the semantics
+may be slightly different. So what is an RPC, or
+a remote procedure call? While an LPC, a local procedure call,
+had both the calling and the call function within the same process,
+in an RPC the caller and the calling functions
+are in different processes. This means that the function call
+from one function to another crosses a process boundary,
+goes from one process into another. This means that we need to ob,
+access objects via global references. You cannot use pointers anymore. Pointers essentially refer to
+virtual memory addresses within that process' address space. An address of say, 1,234, in process P1,
+may refer to completely, something completely different, a different
+object in process P2's address space. So you can't really use pointers as-is to
+access objects across process boundaries, because the address spaces are different. And so you need to have global references
+if you want add access objects. For instance, a global reference may be
+the IP and port number of the process containing the object,
+along with the object number itself. This uniquely identifies the object and
+this allows functions to pass, essentially, global references
+to other functions. You have RPC and similarly you have RMI, or remote method
+invocation, in object-based settings. Where caller method and callee method
+are in different process address spaces. So vectorially, you have a process P1. It has a main function. It has two other functions, f1 and f2. It's main call is f1, that's an LPC. Or a local procedure call. F1 might then call f2, which again is
+an LPC, or a local procedure call. These are LPCs because they stay
+within the same process address space. They use a process stack. However, if I have a second process P2,
+which has its own address space and that has another function f2 then this function f2 will be called
+by the f1 function in process P1. That will be an RPC or
+a remote procedure call. Both these process might
+reside on the same host. In which case it's still
+a remote procedure call. Notice that the remote procedure call
+here does not cross host boundaries. It stays within the same host. But because it crosses process boundaries,
+because it crosses over from process P1 into another process P2,
+it is still an RPC. Or the two processes might
+be on different hosts. In which case you might need
+messages that go over the network. One message carries the request, which is essentially carrying
+the arguments of the of the call itself. That's the RPC request message. And when the RPC is done the RPC
+reply message is then carried back to the calling process P1. So what about the semantics? So we discussed exactly-once semantics for
+NPCs and we would really desire those for RPCs as well, however they turn
+out to be very hard to guarantee in RPCs primarily because networks,
+as you know, are failure prone. The request call message might be dropped
+or the return message might be dropped. The difference between these two is that,
+in one case the called function was never executed, in the first case
+where the request message was dropped. In the second case, where the reply
+message was dropped, it was executed. However, from the calling process
+viewpoint, these two scenarios are indistinguishable, all it knows is
+that it does not hear a reply back. Also, other failure modes could happen. For instance, the call process might
+fail before executing the call function. Or the call process might fail
+after executing the call function. These cases are generally very hard to
+distinguish by the caller function, or the caller process. And so that's what leads to a little
+bit of ambiguity in terms of semantics. Also the network might be duplicating
+messages, so if the request message is duplicated this means that the call
+function might be executed multiple times. And you might have more
+than one execution. So RPCs typically support
+three flavors of semantics, at most once semantics which is
+supported by the Java RMI system, at least once semantics which is supported
+for instance by the Sun RPC system, and maybe semantics which
+are supported by the CORBA system. So these names mean exactly what they say. At most once means that
+you're guaranteed that a call function will be executed either zero or
+one times, no more than one time. At least once says that
+a call function will be, will be executed at least one time,
+but not zero times, eventually. And maybe it doesn't really
+give you any guarantee, it's essentially a best
+effort kind of behavior. How do you implement these? Well, let's look at different
+ways to implement this. So, there are three different design
+decisions that you can make in order to implement these different flavors. First, if the calling function
+does not hear back a response, say within a time out,
+it might want to retransmit the request. Second on the call function side,
+if you share a duplicate request, a request that you've already seen before,
+do you simply filter it out? Or do you, again,
+pass it on just like another request? And third when you receive
+a duplicate request, do you re-execute the function
+the call function? Or do you simply retransmit the old reply? Okay. So if you retransmit the request,
+that's the first column we're looking at. First row we're looking at here. If you retransmit the request but you do
+not filter duplicates and then simply re-execute the procedure, this guarantees
+that if the ca, both the call, the caller and the callee are alive, then eventually
+at least one request will make it across. And, it will be executed
+at least one time. Okay, because your re-executing
+the procedure here, you're not guaranteed that it
+will be executed exactly once. But, you are guaranteed that eventually
+at least one execution will happen if things go right. Let's look at the second row. If your retransmit the request, but you
+filter out duplicate requests, which means that you don't re-execute the procedure
+but you simply retransmit the reply. Then this guy thinks that eventually wo, you know when messages do make it
+across from the caller to the callee this function will be executed but
+it will be executed at most once. You are not guaranteed that it will
+be ever executed because you're not guaranteed that things will
+ever go right in the network. But if they do,
+then it will be executed at most once. But no more than one time because
+you're filtering all duplicates and not re-executing the procedure. Finally, if you don't retransmit the
+request and you really don't do anything on the callee side either,
+then this leads to maybe semantics. So, this is the three
+flavors of semantics in RPCs. Some kinds of operations,
+known as idempotent operations, can be repeated multiple times
+without having any side effects. Some example of such
+operations include x equals 1. Whether you execute this
+operation one time, twice, or a million times,
+the end result is the same, x is set to 1. There are no side effects. Similarly, if an RPC call is provided an
+argument y, which has the same value for each invocation. And if x is set to y then
+the end result is the same. Whether this RPC is executed once,
+twice, or ten times. There are no side effects. Some examples of operators that are not
+that important are increment operations similarly decrement operations. For an increment operation to be executed
+once then x is incremented by one. But if you call it multiple times, then
+x might be implemented multiple times. And so it has side effects. So this is not an item for
+idempotent operations. Similarly, multiplying x by 2, is
+an operation that has different results, whether it is executed once or twice or
+some multiple number of times. While we are discussing this, what idempotent operations are useful
+to be used with at least one semantics? If you have an idempotent operation that
+is inside an RPC, or rather, if an RPC consists of only idempotent operations,
+if the entire RPCs idempotent, then an RPC call semantics that is in at-least-once
+semantics play as well with such an RPC. You can implement at least once semantics. And no matter how many
+times the RPC is called, the end result would be the same
+without having any side effects. So how do you implement these RPCs? So here is an architecture how,
+of how RPCs are typically implemented. On the caller process,
+we call it the client. There's a client stub then
+lots of communication module. On the caller, on the callee process, also, also called our server
+there is a communication module, there is a dispatcher, a server stub and
+then the final callee function itself. Really what we want to have is for the caller function to be able to
+make a call to the callee function. And the reply or the response on
+the return values to be returned back. And so as you notice here the caller
+actual calls the client stub which then passes on the request to
+the communication module, which then communicates with the
+communication module on the server side, and then that talks to the dispatcher,
+and then the server stub, and then the callee, and then the response
+is passed back along the reverse path. So what are all these modules? Let's look at them one by one. The client stub has the same
+function signature as the callee. Okay, so we're talking about
+this function down here. For the signature, or interface, of this
+function is the same as the client stub. This is nice because it
+allows the caller to call the callee function just like
+it was a local function. The caller does not need to know
+that the callee function is not residing in process P1. It is calling a function that
+just looks like a process that looks like the calling function. Think of a clone that essentially looks
+like you but has, is empty inside. But when someone tells something
+to the clone it immediately relays the message to you. Okay, that's a client stub. The communication module is responsible
+simply for request supply messages. So it simply forwards a request and
+replies for appropriate hosts, both on the client side and
+also on the server side. On the server side you
+have the dispatcher. When the dispatcher receives a request
+from its communication module it then needs to select the server stub. The appropriate server stub
+to forward the request to. And the server stub would then call the
+callee and then the callee started returns the return values while P2's local stat
+to the server's stub itself which then transfers it back while the dispatcher
+all the way back to the caller itself. Just to let you know, the dispatchers
+need because it might be multiple callee functions at process P2 that
+are being called by different clients at, at different parts of the system. And so you need the dispatcher to
+decide which callee function to call. The server stub is needed on a per-callee
+function basis so that the callee function has someone to return the return
+values to via its local stack. How do you generate the code for these? Well, do you generate the code,
+do you write the code for all of these components? Well, the answer is no. The programmer only needs to write
+code for the caller function and the callee function. Everything else in between
+is generated automatically. Typically these are generated
+automatically from the function signatures or object interfaces if you're
+using object-based languages. For instance in the Sun RPC system there
+is a language called the Sun XDR or which is used for presenting interfaces. So when you write RPCs and Sun RPC system, you would specify the signatures
+of those functions Sun XDR. Then Sun XDR system will use these
+to generate code automatically for all the components except the caller and
+the callee function. So the clients stop,
+the remote communication module, the dispatcher, the service side stub,
+all are generated automatically from just the interface definitions and
+the signatures of these functions. All of these components form
+a part of the Middleware system, so CORBA which is common object request
+brokerage architecture is an example of a Middleware system that supports RPCs. And the Sun RPC and the Java are my
+other Middleware systems, as well. Now, there's an important
+topic when you discuss RPCs, which is known as marshalling. Marshalling is needed because different
+architectures use different ways of representing data. And yet you want to be able to make
+RPCs across these different platforms. So for instance you might have an Intel
+architecture running the caller function process, and an IBM Z architecture
+running the callee function process. And you want to be able to allow RPCs to happen across these two
+different architectures. However, these architectures use
+different ways of representing data, typically especially integers. There are two popular ways of
+representing data, or storing data, in the architecture. They are known as big endian and
+little endian. These terms come from Jonathan Swift's
+famous novel called Gulliver's Travels. Where Gulliver travels
+to the land of Lilliput. And the tra, the land of
+Lilliput has small inhabitants, really, really tiny inhabitants,
+and they fight wars. They ha, there are two nations in the land
+of Lilliput where they fight wars based on whether they should break an egg from
+the little endian side or from the big endian side and that's where the number
+comes from, where these names come from. So the big endian architectures would
+store numbers as follows if you have a hex number, that is 12 ac 33, then it
+puts toward 12 in the lowest address. Then AC in the next higher address,
+and then 33 in the highest address. Okay, if you had longer integers,
+they are stored in the order shown here. So the IBM z architecture, the System 360,
+all of these use big endian format. The little endian format is reverse. So, a hex 12-AC-33 is stored within
+the 33 byte in the lowest address, then AC in the next highest address,
+and then 12. Okay, here we are using
+byte level addressing. Endian architectures for instance
+follow the little endian architectures. This is why a lot of windows machines
+tend to be little endian here. So this means that the caller process uses
+its own platform dependent way of storing data and
+the callee process does the same as well. And the middle when
+the middleware is responsible for translating between these two. The middleware typically has
+a common data representation format, this is the platform independent platform
+that is chosen only by the middleware. They call this is the CDR. And the marshalling is the process of the
+caller process converting the arguments of the request message
+into the CDR format. So it takes documents which are stored
+in its own platform dependent format and converts it into the platform independent
+format that's specified by the middleware. This is the process of marshalling. But then it can be packaged
+into the request message and sent over to the server side or
+the callee side. The callee process on the other hand
+extracts the arguments from the message and converts it into its own
+platform dependent format. Otherwise it will not be able to pass
+it to the callee function itself. Okay.
+This process of extracting the platform-independent format
+into the platform-dependent format is known as unmarshalling. Kay, so this is the reverse. Similarly, when the callee function is
+done it will marshall its return values into the reply message and then the caller
+function would then unmarshal the r, the reply values from at the from
+the response messaging side. So now that we know RPCs is a build,
+as a building block, we can use them to understand
+the concept no less transactions, and that's what we'll do in the next lecture. [MUSIC]

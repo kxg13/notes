@@ -1,0 +1,24 @@
+[MUSIC] Cloud systems and distributed system
+involve many thousands to many millions of servers interacting with each other and
+also interacting with clients. When you have large numbers of clients
+accessing the same data at servers there's a risk of race conditions,
+where data is inconstant. To combat this, we will study
+concurrency control techniques that coordinate different clients
+accessing the same data. Then, when you have multiple
+servers that are replicating data amongst one another for
+tolerance or for load balancing, we need to have replication control where
+these different replicas, or copies, of the same data are consistent
+with each other. And we'll study that also in this week. Again, these are two
+very important topics and concepts that are used in cloud
+storage and transaction systems today. I also want to remind that for those of
+you doing the programming assignments for C3 Part 2, this assignment
+requires you to understand and use both concurrency control and
+replication control. So, please pay specific
+attention to the second week's lectures on concurrency control and
+replication control. You will be able to reuse
+many of these concepts as you build your programming assignment. This assignment,
+the programming assignment, also uses concepts that you
+have learned from C3 Part 1. This includes the key-value/NoSQL
+storage systems. And if you have not seen that or
+if you've forgotten what that was about, I encourage you to please go back and look
+at those lectures from C3 Part 1 again. [MUSIC]
