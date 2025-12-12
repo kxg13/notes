@@ -1,0 +1,191 @@
+[MUSIC] In this lecture we're going to
+study a particular outage that happened at the Amazon Web Services,
+the AWS service. So this outage occurred April 21st,
+2011 and all the data and all the information we are going to see
+in this lecture are from a post mortem analysis that AWS published
+after this outage as a result. Once again, our goal in this class in
+this outage is not to say that AWS is is a bad infrastructure, in fact,
+it's quite the opposite. AWS is very open and honest and
+transparent with its customers and users, and they kept giving continuous
+updates during the outage and after that outage, AWS improved its
+infrastructure to avoid outages like this. And as you know, AWS continues to be one of the market
+leaders in the cloud computing area. During this outage several
+companies using AWS especially the EC2 service
+Elastic Compute Cloud went down. This included companies like Reddit and
+FourSquare. AWS dashboard showed problems with the EC2
+service and also other storage services as you'll see in the EBS service was the one
+that was the root cause of this outage. The overall outage lasted at least three
+and a half days, and there was also long tail of recovery and some permanent
+data loss for some of the customers. So a little bit of background before
+we discuss the actual outage itself AWS is split into regions. You can think of these regions
+as being separate datacenters. For instance, there's a us-east-1 region, there's a separate region called
+us-west-1, and so on and so forth. Typically, you know customers who are
+running a service for their users want to run their service in a region that
+is close to some of their customers. So if you have servers that are running
+on the east coast you might want to, want to host it on the us-east-1 region. Each region itself is divided
+into multiple availability zones. The best way to think about
+the availability zones is like they are different racks within
+the same datacenter. 'Kay, so you can have automatic rep,
+data replication across availability zones within a region, but this has to
+be explicitly done by the customers and not all customers choose to do it. And the outage here that we see affected
+a lot of customers that did not choose to do it. The outage really affected the AWS
+Elastic Block Storage service, or EBS, which essentially is mounted store, storage devices that are accessible
+from the EC2 instances. So think of these as large volumes of data
+that are being stored, that EC2 instances, VM's, virtual machines are accessing
+them as they're running the servers. Now, in AWS similarly this volume
+runs inside an availability zone, and it uses two networks. A primary network that is used for
+EC2 and EBS control plane traffic, when I say control plane traffic, I mean
+basic operations like create a volume, close a volume, open a volume. This is as opposed to data traffic which
+actually transfers the real data that is stored in that volume. Control plain traffic is relatively less in volume compared to the data plane
+traffic but it is very, very, important. So anyway a primary network is used for
+EC2 and EBS control plane traffic, and the secondary network is used for
+overflow. The secondary network used to be over
+provisioned when this outage happened, used for overflow provisioned
+with a lower capacity. Because the only goal of, [SOUND] of having it was to
+capsule the overflow traffic. If the primary network was full, then you would overflow some of
+the traffic with a secondary network. The control information is
+replicated across zones. This is for
+availability of the control information. And, this includes meta information
+about the volumes, where they're stored, how much data is stored in them,
+but not the actual data itself. That's what I mean by control information. The EBS volumes are replicated for durability and
+each volume has a primary replica. Whenever the replica is whenever one
+of the replicas is out of sync, or when there's a node failure detected,
+the replicas are programmed to do aggressive re-mirroring of data,
+at least, before this outage happened. Which means that if the primary discovers
+that one of the backups is gone or missing or is not responsive, it will try
+to aggressively create another backup. Because, you know, it doesn't want to lose data if another
+failure happens at the primary. So, here is the outage timeline itself. At 12:47 a.m., there was a routine primary
+network capacity upgrade that was supposed to be done in the availability
+zone in the US East Region. The traffic was shifted off several
+primary network routers to other primary network routers. So far, so good. This was as intended. However, the critical error was that
+one of the operators involved in this capacity upgrade shifted traffic from one
+such router to a secondary network router. Remember, the secondary network
+router has very limited bandwidth, because it's only for overflow. But when you shift the entire traffic from
+a primary network router to a secondary network, then the secondary network is
+going to be overloaded and is going to, going to be overwhelmed with traffic. As a result, a lot of these packets and
+messages are going to get dropped, and several EBS volumes will now not
+be able to communicate at all. With their primary they don't
+have any primary network, right? So this means that the primary
+network is disconnected. The second network has low capacity and
+overwhelmed, and many primary replicas have no backup. The team quickly discovered this critical
+error after it started happening, and you might think that at this point
+the outage will start to recover. But as you'd see with outage case studies, outages keep cascading because of other
+reasons that come into play as well. In this particular case after
+the team roll back the critical error the outages have already been triggered. Many primary replicas thought
+that they had no back up. These automatically start a re-mirroring, I guess, simply because they thought,
+well, there's no back up and if another hit failure happens at me,
+then the data might be lost. So let me try to create another replica. And this was happening at all the affected EBS volumes that were on that
+particular primary network. So all at once the free network
+capacity was quickly used and replicas were creating more traffic
+that when they were trying to re-mirror the data,
+this overwhelmed the network even more. And made things even worse. So, you can see how this cycle
+is a cascading loop of very, very bad things,
+leading to even worse things. And this is what is known
+as a re-mirroring storm which affected about 13%
+of the EBS volumes in AWS. When the network was unavailable for
+the control plane traffic, this meant that it was unable to serve
+create volume API requests for EBS, which meant that new volumes
+could not be created. And so a lot of these control plane
+operations like failed volume requests started to back up they started
+to have a long time out, and they started to build up in queues. When the thread pool filled up,
+the control plane started to reject these create volume requests, and this is where
+the customers and users really started to see the outage affecting the servers
+that they were trying to access or run. At 2:40 a.m., this is,
+again, at morning, the, you know EBS engineers are working
+hard to resolve this outage. The team disabled all new create
+volume API requests and at 2:50 a.m., within a few minutes all error rates and
+latencies for the EBS APIs start to recover
+they start to go down. Again, you might think here that
+the outage is starting to end here. But once again cascading
+causes come into play. Two issues, two issues made things worse. The first is that primaries searching for
+potential replicas did not back off. When they tried to create new replicas
+they overwhelmed the network with traffic. This meant that they could
+not create new replicas. But the way the primaries were programmed
+was that they would try equally or harder equally hard or harder to create that primary, that backup
+replica when they failed the last time. They did not back off which
+meant that they did not wait for a longer time to create, to, to make their
+next attempt of creating the backup. 'Kay, so
+this made the system much worse because it overran the network with, with data. Also, a race condition had been known
+to exist in the EBS code that was only triggered by high request rates and this
+was exactly one of the situations where you had very high request rates and so
+this caused even more node failures. So at 5:30 a.m.
+that morning error rates and latencies started to rise again. And the engineers had to tackle,
+grapple with this again. So once again,
+a little bit of background here. The re-mirroring is essentially
+a negotiation between an EC2 node, an EBS node, and the EBS control plane. This renegotiation is required so that you ensure that there is
+exactly one primary for each volume. Due to the race condition
+EBS node started to fail and the rate of these negotiations increased,
+and this affected the EC2 nodes as well. This caused even more node failures and that therefore it again caused rate of
+negotiations to increase, and you can see how the cycle is a cascading loop of
+things getting bad and worse and worser. This resulted in the brown-out of AB,
+EBS API faci, functionalities. A brown-out is essentially where
+you don't have a blackout. It's not that the outage
+completely takes EBS out, but the operations are pretty unreliable. It's the brown term comes from
+from electric power where, you know, instead of having white
+light which is normal light, you'd have brown light when the voltage
+goes below the recommended voltage. So something similar happened in
+the EBS because of these functionality, because of this outage. So at 8:20 a.m. in the morning, the team started disabling
+all communication between EBS cluster in the affected availability zone,
+and the EBS control plane. The availability zone was still down and
+unresponsive all very slow, but the control plane started
+recovering slowly. At 11:30 a.m. the team figured out how to prevent the
+EBS servers in the affected availability zone from doing this
+aggressive futile re-mirroring where they were not able
+to create any backups. And availabilities all start to
+recover at this point of time. Customers still continued to
+face high error rates for new EBS-backed EC2 instances
+until noon new instances that, for creating the new EBS volumes still
+suffered fairly high error rates. And one of the reasons for this was that another new EBS control
+plane API had recently been launched. It was for attaching new EC2 instances to
+volumes, and that had some error rates and some bugs which were being hidden earlier
+by the outage, but that there were, that, that the engineers were seeing now that
+the outage was starting to get resolved. So again, you know, the, these are other causes that come into
+play that keep the outage going on and on. So by noon, however, the good news was that no more volumes
+were getting into the stuck state but 13% of the volumes stayed in the stuck
+state meaning that they were not really accessible, and they were not able
+to create the back up copies. There was a pretty long tale of
+recovery for this particular outage and you can read more details about this
+on the post mortem report by noon, April 24th which is several days after. And the outage all but available percent
+of the volumes had been restored. So 99% of the volumes that were
+affected had been restored. Eventually 0.07% of the affected
+volumes could never be recovered, and the data was lost permanently. Amazon Web Services did give credit
+to these affected customers, not just the ones who lost the data,
+but also the ones whose service was unavailable for
+a significant period of time. This outage affected not only EC2 and EBS, but also affected the relational database
+of the service, also known as RDS the, especially the ones that were
+single availability zone. So what are the lessons we learned from
+this particular outage case study? First outages or failures that are large
+often start with a human error, in AWS case the human error
+was the operator moving the entire traffic from a primary
+network to a secondary network and the secondary network was never intended
+to take over for the primary network. It was only intended to
+be an overflow network. But that's not the only reason
+why the outages keep going on. They keep going on or they balloon
+because of cascading other failures that happen in the system, which may, or may
+not have anything to do with human error. For the specific case of AWS this outage
+could have been avoided in some ways. First, if the network reconfiguration
+processes had been audited well, to create, for instance a step-by-step
+protocol for upgrades, and if the operator had followed these steps
+one-by-one, then perhaps the mistake that triggered the outage of moving data,
+all the data from a primary to a secondary network, then that mistake would
+never have happened, perhaps. They could have had the secondary network
+not just be an overflow network, but instead, have enough capacity to
+take over for a primary network. That would also have prevented the outage. The re-mirroring storm really
+kept the outage going. And if pri, if primaries had backed off,
+meaning that if they tried to create a backup and they failed,
+then they wait for slightly longer than the last time around to make their
+next attempt at creating the backup. 'Kay, if the primaries had
+backed off then the re-mirroring storm would not have happened everyone
+would have played nice with each other, and the outage would not
+have kept cascading. That this condition also kept the outage
+going so fixing it ahead of time might have prevented the outage from
+going on as long as it did. Users who wrote code to take explicit
+advantage of multiple availability zones were not affected
+as much by this outage, as users who just had
+data on one availability. Also, throughout this outage AWS kept giving continuous updates to
+its customers and its users. And their users but in general,
+you know, AWS used this as an incentive as a catalyst to design better
+dashboard communication tools. And if you go to AWS you will find such dashboard tools that give the health
+of each one of their services. The same is true for other cloud
+providers, too, like Google and Microsoft Azure and so on and so forth. AWS gave service credits for his customers that were affected
+by this particular outage. [MUSIC]

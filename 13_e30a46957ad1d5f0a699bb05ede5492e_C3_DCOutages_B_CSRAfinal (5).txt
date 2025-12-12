@@ -1,0 +1,14 @@
+[MUSIC] Congrats. You have made it to
+the week five of C3 Part 2. This week we're going to study
+the classical concept of security. We'll see some of the basic
+security concepts. We won't go into the depth
+of security concepts. Afterall, you can teach an entire
+course on security in Cloud systems, but you know, in this lecture,
+series of lectures, here we'll just provide
+you some of the basics. We'll also see some interesting case
+studies of data center outages, we'll learn from real examples of what
+went wrong in real data centers, and what caused these Cloud outages, so that we can be better prepared with
+designing applications that run on these Clouds, applications that
+are tolerant to such outages. And also, if you happen to
+be in charge of data center, how you can avoid such data
+center outages in the future. [MUSIC]

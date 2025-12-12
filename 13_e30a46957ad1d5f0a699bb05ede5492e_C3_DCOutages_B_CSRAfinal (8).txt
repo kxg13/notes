@@ -1,0 +1,221 @@
+[MUSIC] Finally we are going to see how to use
+the cryptography techniques that we have already seen to implement
+the mechanisms that we've already seen. So we are going to use cryptography
+to implement authentication, digital signatures,
+digital certificates, and then our list has a little
+bit of authorization too. Just for completeness' sake. So first authentication. Authentication is a process where two
+principles verify each other's identity's. So if Alice and
+Bob are communicating with each other Alice needs to convince herself
+that Bob is in fact Bob. Bob needs to convince himself
+that Alice is in fact Alice. There are two flavors of authentication. They are known as direct authentication
+and indirect authentication. Direct authentication involves direct
+authentication between Alice and Bob. Indirect authentication uses a trusted
+third party server Typically, this is called an authentication server. For instance, it might be a server run
+by a well trusted company like Verisign. We'll discuss indirect
+authentication in a second. Let's discuss direct authentication first. So, we have two consumers, Alice and
+Bob, who already share a shared key. We'll call that KAB, and Alice and Bob need to verify that each of them is,
+in fact, who they are pretending to be. So Alice needs to convince
+herself that Bob is Bob, and Bob needs to convince
+himself that Alice is Alice. So for
+this we use a shared key obviously, so Alice first sends a message to Bob
+saying hey, I'm Alice over here. And Bob sends back a random number,
+which is known as a nonce. A nonce is an accepted terminology and a
+popular terminology in security protocols, essentially Bob generates the nonce for every single session that he
+has with any principle and often for any single authentication
+session, a new nonce is generated. Why is it generated? Well, Bob wants to see Alice
+using the shared key on a nonce. So Alice sends back the value of the nonce
+but encrypted with the shared key. And since Alice and Bob are the only two
+with the original shared key KAB, Bob can now verify by using KAB on the same nonce,
+RB that in fact Alice is in fact Alice because Alice is the only other principle
+that has access to the shared key KAB. So this point, Bob is convinced
+that Alice is, in fact, Alice. How about the reverse? Well, we do the same thing. So, Alice also sends a nonce,
+a different nonce, obviously RA, to Bob. Bob encrypts it with the same shared key,
+KAB, and then when Alice receives this, Alice can verify that,
+in fact, Bob is Bob. And so this is wonderful, and it is pretty
+good protocol, it involves five messages. And it involves five
+messages transmission times. Now let's look at it. So why do you need five messages? Essentially Alice and Bob are doing
+the same thing symmetrically but in opposite directions. Why not send this second nonce RA earlier, say with the first message
+over here with Alice. And then when Bob sends back its reply,
+already you can send back. The encrypted version of RA. So why don't we run the more optimized
+version of this protocol, where RA, Alice is allowed to send earlier and
+Bob can also send back its reply earlier. This is essentially trying to achieve this
+protocol here on the slide is trying to achieve the same thing on the previous
+slide, except it's using three messages instead of five, and it involves only
+three message transmission times. Well, not so fast. We have to be really careful
+about protocols like this. If you try to optimize them,
+they may be subject to replay attacks. They may be subject to replay attacks even
+if you don't try to optimize them, so this particular protocol here is vulnerable to
+the attack known as the replay attack. So Alice may in fact not be Alice. Alice may in fact be Eve. Who is pretending to be Alice. And so, Eve might start a session saying, hey I'm Alice,
+pretending to be Alice with a new nonce. And Bob sends back a new nonce RB along
+with the encrypted version of RA. Okay?
+Notice that Eve does not have access to the shared key KAB at all. So, Eve has no way to duplicate
+this message KAB or RA, or anything like that but
+Eve can use the sequence of bytes or bits. How does Eve do this? Well, Eve starts a second session
+where Eve says hey I'm Alice. And in the second session she reuses
+the same nonce RB that was sent by Bob. So at this point,
+Bob would send back a new nonce RB2, but also the encrypted version of RB,
+encrypted with KAB. And this sequence of bytes can now be
+reused by Eve to finish the first session. Eve now goes back to the first session and applies back to Bob saying hey,
+here is the encrypted version of RB. But in fact, Eve did this without
+ever knowing the shared key KAB. But by simply views in the sequence of
+bytes KAB encrypted used to encrypt RB from the second session,
+by replaying this message, Eve was able to convince Bob that,
+in fact, she is Alice. And, at this point, you have
+a security violation in your system. So now you've seen what
+a replay attack looks like. There are a variety of replay attacks
+that happen in secure systems, but essentially it means the attacker is
+able to replay messages from a different session over here. So, the second flavor of authentication
+is known as indirect authentication. This uses an authentication
+server little as AS over here. Typically this is a trusted server,
+trusted by everyone. So essentially every principle in
+the system shares a key directly with authentication server. You can think of this being
+the public-private key or a shared key between Alice and
+AS and also between Bob and AS. So Alice would send a message to the AS
+saying hey I would like to start a session with Bob. The AS sends back a ticket
+which consists of, the AS actually generates a new shared
+key for this particular session. This shared key is KAB, but it does not
+send back the shared key as plain text. Why?
+Because any attacker would then be able to intercept this message which
+is sent in plain text. Instead the AS uses the shared key with
+Alice to encrypt the shared key itself, KAB so that Alice is then able to decrypt
+this first part of the message and get the shared key KAB and is also
+decrypts KAB using AS shared key with Bob. So Bob is able to give the second
+part of the shared key and no one else is able to do that. Alice retrieves KAB from
+the original ticket message. And Alice and Bob are the only ones
+who will be able to decrypt parts of the ticket message. So Alice is able to decrypt the KAB, but
+then sends out the rest of the ticket, the second half of the ticket onto Bob, which can then at that point obtain KAB by
+decrypting that second part of the ticket. At this point, Alice and
+Bob both have K AB and they are the only ones to have
+access to the shared key AB, because no one else can decrypt
+parts of this ticket message. And now, Alice and Bob can start communicating with
+each other by using the key KAB. So this way Alice and Bob use this third indirect authentication
+server to share a shared key. Next we move on to digital signatures. Digital signatures are just
+like real signatures. When you sign a document people expect
+that the signature is authentic, that no one is able to forge your
+signature, so it's unforgeable, anyone is able to verify your signature
+and finally it's non-repudiable. Once you have signed something you
+cannot withdraw that signature. So to sign a message M, so to say that,
+hey, I am the one who has signed message M, Alice would encrypt
+the message with her own private key. Okay?
+So when we were sending secured messages
+we were using public keys to encrypt. Here we use a private key
+to encrypt the message. So you send the message M along with
+the encrypted version of the message M encrypted with Alice's private key. Why do we use the private key? Well this allows anyone in
+the world to be able to verify by using Alice's public key, that in fact,
+this second part of the message, the signature,
+is in fact Alice's signature. So if you use Alice's public key to
+decrypt the second part of the message, you should get back the original message
+M, and in this way you know that Alice is the only one that
+could have signed this message. If an attacker, for instance,
+modifies some bytes of the message M, then decrypting the second part
+will not give you M, and so you immediately you know that
+the message has been tampered with. If a different attacker modifies
+some of the bytes of the encrypted, the second part of the message M,
+The encrypted version message M. Then recrypting it with Alice's public
+key will give you some gobbledygook, and that'll be different from the message M. And this point again, you know that
+the message has been tampered with, okay? So this ensures that messages, if they're
+tampered with, can be discovered quickly. However as you know encrypting and decrypting can be fairly
+costly operations. They might involve a lot of time
+as you've already seen before and if you are going to do the signing
+business very frequently this might become a very
+inefficient operation. To make it more efficient you can
+use a one reHash function first. For instance, secure hash algorithm one,
+message digest five. And you first hash the message,
+which is typically a fast operation and results in a small approach,
+usually just a few hundreds of bytes. And then you use the encryption
+with a private key on this hash. So this ensures that you're using
+the encryption of a very small sequence of bytes and so it's very fast. So you don't need to enter
+the entire message, and on the receiving side when
+someone is very far and trying to verify the signature,
+they can also hash the message. Again the hashing operation is very fast. And then verify that when
+you use a public key on the second part of the message you
+get back the hash of the message, and that ensures that the signature
+is in fact verified. Finally we discuss digital certificates. Again these are just
+like real certificates. So, someone who gives you a certificate
+saying hey, you have taken this particular C3 course should also be able to give
+you certificates in the digital world. And to do this again digital certificates
+use the concept of digital signatures like you have just seen. Digital certificates typically
+have a standard format. And they have transivity property. So they have a standard format so
+that principles who receive a certificate are able to verify that
+the certificate is in fact correct. They have a transitive property so if someone is giving you a certificate,
+that particular someone should be actually certified to give
+you the certificate in the first place. And so you can trace a chain backwards,
+a chain of certificates backwards, and it should end at a trusted authority,
+which is at the root. So let's see an example of this. So, say Alice opens a bank account
+at Charlie's Bank, and so Alice is given a digital certificate that says hey,
+this is the account number for user Alice. The account number is 12345. And certifying authority
+is Charlie's bank. There's a signature with certificate which
+is essentially you take the a name a field the second field over here, the account
+number field and you mash them together maybe do an addition or concatenation
+whatever something that is consistent, and then you take a hash on that for
+compaction so that it's compact. And then you apply Charlie's private
+key to derive the signature. This means that anyone receiving the
+certificate will be able to use Charlie's public key to decrypt the signature and
+verify that in fact, when you add the name and account number, and hash
+it using the well known hash algorithm. The good, bad and the same upward. If someone tampers with either the name,
+the account number, or the signature fields in the certificate, then the certificate will become invalid
+and people will not be able to use it. So essentially no one can tamper
+with the certificate itself without affecting its correctness. So Eve, for instance, who might want
+to insert the name Eve over here would not be able to do that because then
+the certificate would become invalid. So here we have shown Alice getting
+a certificate from Charlie, from Charlie's bank but Charlie in
+turn should be given a certificate for instance for Charlie's public key. So a certificate that says Charlie's
+public key is in fact Charlie's public key might be given by the banker's federation. So this would be a certificate
+shown here given to Charlie. Once again here the name
+field says Charlie's bank. Public key has the actual public key
+in the The certifying authority is the Banker's Federation. Banker's Federation would then sign
+this message by using the name and the public key over here along with
+the Banker's Federation's private key. Anyone receiving this would be able
+to then verify that in fact the name, public key and the signature are in
+fact matching with each other. The Banker's Federation will be given
+another certificate by Verisign, a well trusted authority. The Verisign will now be at the root
+of the certificate tree in this particular case. And this particular certificate given by
+Verisign to the Banker's Federation would say that the Banker's Federation is
+being given the Public Key KFpub. And then it is signed by
+the Verisign authority. Everyone trusts Verisign,
+we're assuming here. And so
+everyone is able to very the certificate. So you've seen that we have constructed
+a chain where Alice is given a certificate by Charlie who is in turn given
+a certificate by the banker's federation, who is in turn given
+a certificate by Verisign and so, you have essentially a root,
+a tree or a drag or draft of certificates that might be
+given across pairs of individuals. And all the certificates if
+you follow them in reverse, just follow the chains in reverse should
+read to a well trusted root authority. Finally for
+completeness we discuss authorization. So, when you have a given a pair
+of principle trying to access a particular object,
+say trying to write particular, how do you know whether that is
+in fact an authorized operation? So for every pair of principle comma
+object pairs in the system, you need to, you may want to maintain information
+about whether that principle is allowed to access that object,
+and if so in what mode. So some principles may be allowed
+to reread a particular object, other principles may be allowed to read
+as well as write to a given object. This is known as the access control
+matrix, for every row of the matrix corresponds to a principle, and
+every column corresponds to an object, so the i,j entry in this matrix is
+maintaining information about whether the ith principle is allowed to access
+the jth object and, if so, in what mode. However this matrix may be very large. There might be thousands of principles and there might be millions
+of objects in the system. Also a lot of the entries in
+the matrix might be empty. It might be a sparse matrix because
+most of the principle comma object pairs the default entry might be no access. So this is a lot of wasted space. Instead you have two other options
+the access control less than capability which are far more compact. The access control list
+is a per object list of principles who are allowed
+to access that object. Along with the mode of access
+allowed to each individual. The capability list is
+kind of the converse where you maintain a per
+principle list of files or objects that this particular
+principle is allowed to access. And the type of access that is allowed for
+that particular principle. You could also split all the capability
+lists into individual capabilities where for each principal comma file pair,
+or each principal comma object pair, you may get information about whether that
+principal is allowed access that file or that object. Okay, in this slide the terms file and
+object are used interchangeably. Wrapping up our discussion of security. Security challenges abound
+in today's disparate systems especially because of the large
+scale of these systems. There are a lot of threats and attacks
+that are possible on these systems. The confidentiality, integrity, and availability properties
+are desirables properties. And then you use mechanisms
+to implement these policies. Mechanisms such as encryption and
+decryption. Also mechanisms such as shared key
+infrastructures are probably private key infrastructures. And these can be used to implement
+authentication, signatures, and digital certificates. We have also discussed authorization
+which is important in secure systems. [MUSIC]

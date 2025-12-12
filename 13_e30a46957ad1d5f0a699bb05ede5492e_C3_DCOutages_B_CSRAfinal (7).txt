@@ -1,0 +1,118 @@
+[MUSIC] In this lecture, we're going to see
+some basic cryptography concepts. These are applicable to not
+just distributive systems, but computer systems in general,
+that want to use cryptography. So an important terminology that is used
+in a lot of security protocols when, especially when discussing
+cryptography is that of principals. And, essentially a principal is a process
+that carries out operations, or actions on behalf of a user. If I say a principal is Alice, essentially that means that the process
+is acting on behalf of the user Alice. Similarly, Bob, Carol, and Dave are users,
+or the principal names, and as you can notice, these are starting
+with the letters of the English alphabet. Eve is typically an, evil, attacker. Mallory is typically malicious, and
+Sara sometimes is used as the server. So in cryptography,
+an important concept is a key. A key is essentially a sequence of
+bytes that is assigned to a user, and the key can be used to lock a given
+message, any given message. So, you can take a message, and you can take the key, and
+you can lock the message, so that, only that key can then be used to
+unlock that particular locked message. Okay, so if you don't have the key
+then you cannot unlock that message. Essentially this is used to ensure that
+messages are sent over the network in a way that only authorized
+individuals who have access to the key can in fact unlock that locked message. Keys are used in many, in many different
+ways, and there are different flavors of using keys, and there are many
+different flavors of key-based systems. The way in which you use a key is,
+you take a message, you apply it the key on it, and
+this process is known as encryption. This leads to an encoded message,
+which is, again, a sequence of bytes, but essentially, the encoded message, the
+sequence of bytes, would not make sense to any attacker who is able to intercept
+the message on the network. Unless the attacker also
+has access to the key. So only those with access to the key
+can take the imported message sequence of bytes, use the key on it,
+and then use decryption so that you get back the original message,
+the original sequence of bytes. If you don't have access to the key and you use a decryption on
+the encoded message. You're likely to get back
+some garbage gobbledy gook, which is not the original message. So no one can decode an encoded message
+without having access to the key. So if you have two individuals that have
+access to a given key, only those two individuals can send messages to each
+other that are encoded and decoded, or encrypted and
+decrypted using that particular key. No other attacker or
+no other individual in the system. Even if they are not an attacker,
+is able to, would be able to listen to messages that are being exchanged
+by this pair of individuals. So as I mentioned, there are different
+flavors of cryptography systems. There are two important flavors. They are symmetric and asymmetric. Let's discuss the a symmetric first. Then we discuss the asymmetric later on. So symmetric key systems
+Alice may be given a key, we'll note that as K of A, or just KA. This key is secret to Alice. There might also be a key that
+is shared between Alice and Bob, that's the order is Kab,
+sometimes it's Ka,b. This key is known to both Alice, as it is
+Bob, and this can be used to encrypt and decrypt messages that are sent between,
+Alice and Bob. You use the same key, Kab, to,
+both encrypt and decrypt the message. For instance, the data encryption
+standard uses 56-bit keys. And when you are given the message DES
+essentially splits up the message into 64 bit blocks and then it applies the 56
+bit key to encrypt each 64 bit block and the output is then concatenated
+to the previous block's output, and that's the encoded message. The second flavor of systems is what
+is known as public private key systems. Here, each user is given not just one key,
+but is given a pair of keys. So Alice has both a private key and
+a public key. Alice's private key known as
+Kapriv is known only to Alice and no other principal in the system
+knows Alice's private key. That's why it's private. It's secret. A Ka pub, Alice's public key is
+known to everyone in the system. 'Kay, this is, the exact opposite
+of the private key, 'kay. But the private and public keys are paired
+with each other in a special way. In the sense that any message that is
+encrypted with the private key, Alice's private key, can be decrypted only by
+using Alice's public key, and the reverse. Any message that is encrypted
+using Alice's public key can only be decrypted
+using Alice's private key. So typically you generate
+public-private keys in pairs using some well known algorithm. And these key, these pair of keys
+are related to each other so that a message encrypted with one key can
+only be decrypted with the other key. And cannot be decrypted by an,
+with any other key in the system. One of the common ways of
+generating these private, public private key pairs is the RSA or the Rivest Shamir Adleman algorithm
+which typically uses prime numbers. So RSA is a well known standard for
+instance of a public private ky system. A PGP which some of you
+might be using already, known as Pretty Good Privacy is another
+example of a public private key system. Keys need to be several hundreds, in some
+cases, several thousands of not just bits. But several bytes long. And the longer they are,
+the more secure is the system. Because the harder it is for attackers to
+guess what the key is or to break the key. And the key's very small. So the key is just four bytes. And essentially the attacker can, can
+cycle through all the four combinations. Or other. Say it's four bits. Right. And so the can, can cycle for all the too
+powerful combinations of ones and zeros. And whichever one leads to a message that
+seems to make sense, would be your key. So the larger your key is, the more
+computationally difficult it becomes for the attacker to guess what your key is. How does everyone know Alice's public key? Well, typically,
+a public key infrastructure, or known as a PKI, is maintained. Which maintains the public keys of not
+just Alice but all the principles in the system, so anyone can access
+anyone else's public key. If Alice wants to send a secret message M
+that Alice only wants Bob to be able to read, essentially Alice encrypts that
+message with Bob's public key, so you take the message M. And you apply Bob's public
+key K B pub on it, and the resulting encoded
+message is then sent to Bob. This can only be decrypted
+by using Bob's private key, because that's the only key that's
+paired up with Bob's public key. And so Bob is the only one that has access
+to that private key, his own private key. And so Bob is the only one who will be
+able to decrypt this encoded message. Okay, so when you apply Bob's private
+key when you, apply, decryption, using Bob's private key on the encoded message,
+you will get back the original message. This is symmetric, too, so
+you can do the same thing, by using the public key first and
+then the private key next. So if you encode a message with your
+private key, then it can be decrypted using the public key and this mechanism
+you'll see later on is used for implementing signatures
+in the digital word. So when do you use the shared or symmetric
+key system versus the public key system? Each of these systems has their pros and
+cons. Let's discuss the cons. The shared key system
+reveals too much information, makes it harder to revoke
+permissions from individuals. For instance,
+suppose there is a group of say ten or 15 individuals that are sharing
+the same group key, so that they can send messages to each
+other only within the group and no one else outside the group would
+be able to understand these messages. Now, if you want to remove
+one principle from the group. Essentially you need to change the group
+key for everyone in the group. And that's [INAUDIBLE] harder. So revocation is a fairly expensive
+operation in the shared key system. In public private key systems,
+the disadvantage is that the encryption or decryption operation could be very costly,
+meaning it consumes time. So if you have a very large message. That encrypting the message
+might be very expensive. And there are some variants of
+public/private key systems where encryption is a fast operation,
+but in those variants, decryptions become a slow operation. So, at least one of these two operations
+ends up being costly and time consuming. As a result, some systems use a hybrid
+where they might use a public/private key system to generate shared keys, and
+then later on use these in use this, this shared key on
+the messages themselves. In the next lecture, we're going to see
+how to use the cryptography techniques that we have seen in this lecture, to implement the mechanisms that we
+discussed in the previous lecture. [MUSIC]

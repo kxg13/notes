@@ -1,0 +1,83 @@
+[MUSIC] Okay.
+In this third and last outage case study, we're going to study an outage of
+this company known as The Planet. This outage occurred on 31st May 2008. And once again, the information that
+I'm discussing here is available from, the post which is available at
+the URL shown on the slide, which is an availability digest URL. The, Planet at that, time at the time,
+at the time of this outage was the fourth largest web hosting company, and
+it supported 22,000 websites. It had six data centers at that time. Two in Houston, four in Dallas. This particular outage took down
+9,000 servers and seven and a half thousand businesses. The outage started at about 6 p.m. With an explosion in
+the H1 Houston Data Center a short circuit in the transformer
+set the transformer on fire. Normally when the transformer goes
+on fire, the backup power supply, the UPS kicks in to
+keep the server online. However, in this case the fire in
+the transformer caused an explosion of battery acid fumes from the UPS backup. So this was a cascading things of
+failures, physical failures, that caused the power to go off [INAUDIBLE]
+of the servers in the data center. Also because this was fire,
+real fire here. This blew out three walls
+of the first floor. So this is an example of an outage
+that actually did not involve human error at all. I mean, you can argue that there was
+potentially maintenance issues involved here that could have prevented
+the transformer from catching on fire. But there's no explicit human trigger here
+that triggered this particular outage. It was really fire in
+this particular case. So there was an explosion that just
+blew out three walls of the first floor. Thankfully, no servers were damaged,
+but 9,000 servers were brought down because essentially they did not have
+any power source at all to them. And the fire department
+quickly responded to this, and they evacuated the building for
+the safety of all the personnel. They also directed that the backup
+generators could not be turned on because there was a fire hazard. Also, because of the fire hazard, no staff
+are allowed back in until, about 10 p.m. However, there were several
+services that went offline and several customers who were complaining
+about the services being offline, and the rumor is that the Planet
+staff had to physically ship some of the critical servers to some of
+their other DC centers in, Houston and in Dallas on, you know, on their
+pickup trucks and so on and so forth. Again, this is a rumor. It's unsubstantiated. I do not know whether this is true or not. But of course they could not transfer
+all the 9,000 servers it affected, to the other data center, because the
+other data centers were almost running at the capacity of their power and, cooling. So, by 5 p.m., June 2nd, power was
+restored to the second floor, and on June 4th, a couple of days later, the first floor servers were being
+restored back, one rack at a time. So, this was a very slow, painstakingly
+slow process of bringing the datacenter, the affected datacenter back
+online one rack at a time. All the while during this outage,
+the planet was, the company was very transparent and
+open with its customers. They provided frequent updates
+to all its customers and the frequency of 15 minutes
+to one hour per update. This kept the customers reasonably well
+informed about what was going on and what was the expected time
+to recover from the outage. What lessons can we
+learn from this outage? Well first you know, outages will happen. Even if it's not human error,
+they're going to happen. Fire happens, right? So as a customer who's running a service,
+your service on a data center. You may want to back up
+not just your data, but also your service across
+multiple data centers. So that, there is four. So if one of the data centers goes down,
+then the other data center is up, and it's able to service at
+least some of the requests. Entire data centers could go down. Entire companies could go down. They could go bankrupt. So you may want to have backups not just
+across data centers of the same provider. But across data centers
+of different providers. [COUGH] So for instance you can want it
+on one version of your service on Google on the Google Cloud. Another version on Amazon Web Services,
+and another version on the Microsoft service. These are sometimes known as
+business continuity plans, that insure that in spite of disasters
+that happen at these different providers your service is still up and
+running all the time. However, running your service on these
+three different providers like the example that I mentioned with Google Cloud AWS and
+is easier said than done today. It's very hard. Because these different cloud
+providers have very different APIs and very different ways in
+which they store data. It's an open question about whose
+responsibility should it be to replicate data and
+services across different providers. Should we not buy
+the providers themselves? Perhaps the customer pays some
+extra insurance money, and the provider ensure that the data and
+services are replicated no matter what. Or should it be done
+explicitly by the customer? This, of course, is far more painstaking because it
+involves extra work, at the providers, and also because the different providers
+store data in many different formats. So there is data lock in at each provider
+and when you want to transfer data from one provider to another, you need to
+export the data into a common format and then re import it back into
+the destination data center format. It's a, so, the whole problem becomes
+very challenging because of the lack of. Standard API's, and also because of the
+lack of, and also because of the lack of, standard, data formats, which leads to,
+data lock in at individual providers. 'Kay so, if you go to the provider
+all this may cost customers more, but it's sort of similar range as premiums,
+maybe that's a way to go forward. Or maybe, you know, customers will,
+start to build, their own, business continuity plans that
+cover multiple providers. The next few years will, tell us, which way the industry is going
+to go on this particular front. [MUSIC]

@@ -1,0 +1,78 @@
+[MUSIC] In this next series of lectures we're
+going to be seeing a set of case studies that look at particular datacenter outages
+that happened over the last several years. And also the causes for these outages. So, just to start with, here's a simple
+quiz question for you to think about. This is not an automated quiz, but
+something for you to think about. Here are some possibly common
+causes of datacenter outages. When I say datacenter outage, I mean
+something like, Facebook goes offline for several hours, or Amazon web services
+goes offline for several days, or you know, some website goes offline for
+for a significant period of time. When such an outage happens, clearly something might be
+happening at a data center. Why do you think a data
+center might go out? One cause might be power outage. Maybe they forgot to pay their bills. The second cause might be over-heating. Maybe some of the servers
+are working too hard and they caused too much of a temperature rise, and
+that caused the data center to shut down. The third cause may be human error,
+maybe someone committed a mistake. Fire is of course something that
+always could take datacenter down, and finally you can have
+denial of service attacks, which are explicit malicious attacks
+by humans or bots on datacenters. Which of these do you think
+is the most frequent? So take a pick and
+know the answer is human error. In fact, it turns out that 70% of
+datacenter outages are caused, at least the initial cause
+is because of human error. Human error is not the only factor
+that comes into play, though. Power outage, over-heating, fire, and a,
+and a host of other reasons also come into play, but typically,
+the outage is triggered by human error. But there are always other factors
+that keep the outage going, as you will see as we go along. To give you an example of human error
+being responsible for outages, here are some examples that I've taken from
+a website called availabilitydigest.com. One example was that a system operator
+mistakenly deleted the $38 billion Alaska Permanent Fund database,
+and then also deleted its backup. This res, this resulted in the entire
+database being gone, all right? So this is clearly human error. The second example was when
+a maintenance contractor's mistake shut down
+the Oakland Air Traffic Control Center. A third example was a State of Virginia
+technician pulled the wrong controller, and crashed a redundant SAN, storage area network that had already
+suffered a controller failure. And so this is the example of an outage
+that started with a human error, that was triggered by human error. But there were other cascading effects,
+such as an already existing controller failure that caused
+the outage to become worse. In my earlier other example
+was a technician with the DBS Bank made an unauthorized
+repair on a redundant, on a redundant storage unit network and
+took down both sides. There are many more
+examples on this website. And here are some more. The, I don't want to go
+through all of these. I just want to point out one of them. You can pause the video at this point and
+read the examples. But one of them that is really useful here
+is this one highlighted in orange font. Siren noise damaged several disks,
+including the virtual backup disks. It's somewhat less well-known that
+noise affects the performance of disks. There are some videos on YouTube
+that you can find that show this. But essentially because hard disks
+involve the precise movements by the head of the hard disk over the platter,
+the magnetic platter noise can affect these precision these precise movements,
+and can affect the performance and the bandwidth, the throughput
+of these hard disks as well. They can also cause hard disks to crash or
+rather the heads to crash and then the hard disk may
+result in lost data. So there are many more
+examples such as this and what we want to be doing is picking a few
+of these examples of major outages, and studying them in detail, 'kay? So why do we want to study
+these outages at all? Well the first reason is because
+they're sort of fun to study. Schadenfreude is an English word,
+originally from German, that says that we take pleasure in the misery of others
+that's not really our goal here. Our main goal here is to learn lessons, to study these outages as
+evidence of what could go wrong. And to draw conclusions about
+how we can avoid such outages. 'Kay, in general we want to be able
+to learn about the actual behavior of systems in the real world, in the wild. You know,
+after this course you might write code for maybe even cloud computing systems. Your code is going around on servers and
+datacenters. And it's better for you to know what might go wrong with
+these datacenter requirements, so that you can prepare ahead of time
+in terms of how your service runs. Okay, so this will hopefully help us
+design better systems in the future. Once again, the goal of this series
+of lectures is not to say that some companies are worse than others. It is not to point fingers. Everyone suffers outages. As we know in this course, failures
+are the norm rather than the exception. In fact, it turns out that
+the examples that we'll see for the most part are companies, and
+that responded very well to outages. When the outages, the inevitable outages
+did happen, the companies were very transparent and very open and very
+honest with their customers and users. And in fact after the outages
+were were resolved, and the companies wrote postmortem
+reports that analyzed the outage and in fact all the information you see here
+is open information that is available on the web from these postmortem reports. 'Kay, so this goes along with the adage
+what doesn't kill you makes you stronger. Okay, so we'll see a few
+case studies of outages, and then we'll learn lessons from them. [MUSIC]

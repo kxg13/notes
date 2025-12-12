@@ -1,0 +1,107 @@
+[MUSIC] In this lecture, we are going to recap and
+summarize some of the lessons that we've learned over the three key studies
+of your seen of the central outages. Outages are inevitable, whether they
+are triggered by human error or whether they are triggered by fire or
+some other natural causes. They are going to happen no
+matter which company you are, and no matter how robust you
+claim your infrastructure is. We've seen how the leading
+cloud providers AWS, Facebook, and
+The Planet suffered from outages. But these are three examples of
+companies that also kept their affected customers and users updated
+throughout all the entire outage with frequent updates
+about what was going on. And after the outage was
+resolved they gave the, affected folks coupons and discounts. They also analyzed and
+published post-mortems of the outage. What led to the outage,
+what kept the outage going, and how they fixed it for the future? All of these bullets
+are customer confidence. So, if you are going to run a data center
+for customers, it's a good idea that you are honest and open and transparent
+with users all the way through. Many companies use dashboards
+with real time information, so you can check out Google Apps dashboard if
+you are just searching Google for it, or check out the AWS dashboard,
+if you search on any search engine for it. These have up to the minute
+information about which services are suffering from a,
+a bad state or which services are healthy. And if it's a bad state,
+what is currently going wrong and what is, in some cases, the expected time
+to recover from these outages? However, not all companies are as
+open as the ones we have discussed. RIM which is the maker of the Blackberry
+had pretty long outage in 2007 a day long outage but they never
+published a post-mortem about it. Hostway in 207 informed customers it would
+move its data center from Miami to Tampa. And that they had a planned outage
+that would be 12 hours long, but when they executed it,
+the actual outage was between 3 to 7 days. So, planning is very important as well. Overall we learn a few lessons. First, the data center fault tolerance
+is somewhat akin to human ailments or medicine today. Most common illnesses
+are addressable today, so. In most parts of the world, at least
+the developed world common cold and the flu influenza you can just go to the
+doctor and they will give you a medicine for it or you just take rest and
+you'll recover from it. This is similar to how
+crash failures are or crash stop failures or fail stop failures
+are handled in most of systems today. There is well known protocols and well known administered algorithms
+that are fault-tolerant. However, non-common cases
+can be very horrible when the end of life diseases hit you,
+there are no really known cures for most forms of cancer,
+at least as of today. Similarly even outages happen, it's very hard to respond
+very quickly to the outage. It's very hard to know what's going
+to go wrong during an outage and to prepare for it. Testing is very important,
+whenever you set up a service, whenever you set up a center, you need to
+make sure that you've tested it enough. Especially that you have tested it for
+disaster tolerance. So for instance, American Eagle, during a
+disaster, when the disaster was going on, they discovered that they had backup
+data center which they had set up so that they could failover to it. But they never tested whether
+the failover actually worked. So during the disaster, they discovered
+to their chagrin that actually the failover didn't really work, so they
+could not use their backup data center. Had they tested, well then they would
+have fixed this failover mechanism. Upgrades that are planned but that failed are that failed
+are also a common cause of outage. So, someone for instance tried to upgrade all the oasis
+and all the machines in a data center. But for some reason, that upgrade failed. This causes those machines
+to be in a hung state, and causes the data center to be out. And so whenever there's an upgrade, you need to have a fallback plan that
+you can rely on in order to, for instance, rollback the upgrade and
+restore the old state. Data availability and recovery is something that we've
+talked about during the case studies. Business continuity processes and
+disaster-tolerance is an important requirement for
+many of the cloud services today. This can be provided by cross-data
+center replication, either provided by the provider or provided by a customer
+explicitly by writing code for it. Consistent document is very important too,
+there are well known books, and well known, treatises on the fact that making lists is a very good way to make
+sure that you are not making mistakes. One of the examples of this is that there was an outage with the Google
+app engine several years ago. And the outage was prolonged because
+the actual operations personnel did not know which of the versions of docs
+which had lists of things to do on them was the current latest version. There were multiple conflicting versions,
+some of them old, some of them new, but they didn't really know which ones
+were new and which ones were old. In order to avoid this in the future, Google has adopted the fix off, explicitly
+marking old documents as deprecated. So that when someone looks it, they
+know that okay, this is an old version. And perhaps the document also contains
+a link to a newer version of the document. This is a good practice for
+us to follow in princi, in principle, even if it's for
+any of the documentation that we write. Outages in generals, as we've seen, in general are a,
+a cascading series of failures. They start with a trigger, which may
+be a human trigger in some cases. But they keep going, but they keep going
+because of other causes that, that keep, that come into play. And usually somewhere along
+the way there is a a loop, a cascading loop that happens. And perhaps there are new ways,
+new techniques that they can discover or invent to break this chain,
+to break this loop and to prevent these outages from going on for
+as long as they do today. There are also other sources of outages
+that we have not discussed in our case studies. Denial of service attacks, distributed denial of service attacks
+are well known causes of outages. Internet outages where the entire
+network is blocked off and there is no communication possible between data
+centers is a well-known cause of outages. For instance,
+undersea cable might be cut by a trawler. There might be a failure in the DNS. A government that engages
+in censorship might block particular websites by
+blocking the DNS entries. These are all well known
+sources of outages. In some of these countries where DNS is
+blocked there are alternate DNS services open DNS services as well that
+are available and that users use whenever they want to access a website
+that is other wide, otherwise censored. Many failures are unexpected as we
+have come to know in this course. But also there are planned outages for
+instance, kernel upgrades or upgrades of particular parts
+of distributed services. And so when you have planned outages,
+these need to be planned well. They need to have steps that are
+well-documented and that are followed and ticked off by the operators as they
+go along from one step to the next. Also you need to have
+fallback plans in place. So if this particular planned upgrade
+goes wrong for whatever reason,. Then what is a fallback plan. How do I roll back this upgrade, so that I
+can get back to an operational state and then perhaps try to upgrade
+later on in the future. Hopefully, this, this set of keys
+has been informative to you and the lessons here have been both
+informative as well as useful to you if you are planning to start
+up your own data center or planning to run services one some
+of the existing data centers. [MUSIC]

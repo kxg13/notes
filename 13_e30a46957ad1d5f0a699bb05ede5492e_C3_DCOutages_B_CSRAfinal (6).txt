@@ -1,0 +1,135 @@
+[MUSIC] Hi there.
+In this next series of lectures we're going to see some of the basic
+security concepts as applicable to not just distributed systems, but
+also as used in general computer systems. So, there are many different kinds of
+security threats that can be launched on a distributed system or
+any system that uses servers. Three of the common security threats
+are leakage, tampering and vandalism. Leakage essentially means that
+someone gets unauthorized access to a service or to a data. That they're able to read or
+access, read the data or access the service while they
+should not actually be able to. For instance, if someone else gets to know
+your bank balance, who's not authorized to know your bank balance, who's not one of
+the account holders on your bank account. Then that's leakage. Tampering goes a step further where
+someone not just gets access, but is able to modify data or
+is able to modify the service. For instance, if an unauthorized
+individual modifies the balance in your bank account without you having authorized
+that, without you having written a check or done a bank, bank transfer
+then that is known as tampering. And finally, vandalism essentially means
+that someone interferes with the normal service or normal operation of the system
+without necessarily benefiting directly from this attack. The most common type of vandalism
+attack is denial of service, where for instance a particular service may be un,
+inaccessible to legal customers. Because an, an attacker is
+bombarding that service with a lot of unnecessary and
+with a lot of unnecessary messages. So these are, threats are typically
+carried out while some attacks. Some of the common attacks
+are listed on this slide. Eavesdropping essentially means that
+the attacker is able to listen to messages by tapping into the network. For instance, if someone is able to
+intercept all the messages in the network, then they are eavesdropping. Masquerading goes a step further where the
+attacker is not just able to read messages but is able to pretend to be someone else. And you will see an example of this as we
+discuss some of our security protocols. Essential this is similar
+to identity theft. But in the computer world, where a machine
+claims to be acting on behalf of user Alice, while in fact they're acting
+on behalf of user Eve, who is you. Then, you have message tampering where
+the attacker is able to modify messages in the underlying network and,
+and send them forward so that they can, for instance,
+masquerade to be someone else. You have replay attacks where the the
+attacker is able to replay old messages. This is a particularly insidious form of
+attack, where by replaying old messages, for instance, you can prove yourself
+to be someone else that you're not. And finally, denial of service is
+typically carried out by bombarding a particular port, say the http port. So that the other regular
+messages by valid, legal clients cannot get through
+that port just because of being overwhelmed by the other
+messages being sent by the attacker. So, how do you address these challenges? Well, there are three properties that
+secure systems typically try to provide. These are known as the CIA properties. They stand for confidentiality,
+integrity and availability. Confidentiality essentially says that
+you're protected against disclosure of your data to unauthorized individuals. This addresses the threat of leakage. It says that your data is
+essentially confidential, and only those who are allowed to
+read the data are able to do so. Integrity essentially says that only
+those who are allowed to alter the data are allowed to do so, who are able to
+write the data are allowed to do so. For instance, for your bank account,
+it maybe only you who is allowed to alter the data, and of course, the bank
+who might be acting on behalf of you. Anyone else would not be able to alter or
+corrupt your data. This addressess the threat of tampering. And finally,
+availability says that the service or the data is always reachable,
+is always readable and writable letters. You're able to carry your operations
+on the service or the data. And this addresses
+the threat of vandalism. So, these three properties are examples
+of properties that we desire in a system. This is what we want
+the system to archive. We haven't yet said yet how the system
+achieves these three properties. So, this difference between what and how can be laid out by differentiating
+between policy and mechanism. And this is one of the key aspects key concepts in distributed systems
+as far as security is concerned. This is very important for
+us to understand. This has been advocated
+by many scientists and is actually used by secure systems today
+to differentiate between what and how. A security policy indicates what is
+secure system wishes to accomplish. Okay, so this is typically a human
+level goal of what you want the or the system to be secure against and
+how you want it to be secure. For instance, the CIA properties
+of confidentiality, integrity and availability properties are properties
+that we desire from a secure system, and so these are security policies. A security mechanism, on the other hand, indicates how these
+goals are accomplished. So given a security policy, you can
+design security mechanisms which then, implement that particular policy. For instance,
+you could use encryption capabilities and a variety of other mechanisms
+that we'll all see in this series of lectures to implement
+a given set of policies. It's very important for you to be able to
+distinguish between the security policy and the security mechanism because
+typically these are separate. And it's not always
+the case that security, a set of security mechanisms always
+accomplishes the security policy. That gap is typically what a designer
+of secure protocol needs to bridge. So, what kinds of mechanisms exist? Well there are three types of
+mechanisms that are popularly used. These are known as the Golden A's
+by some security researchers. They are authentication,
+authorization, and auditing. Authentication essentially is
+a mechanism that verifies that a user claiming to be say,
+Alice, is in fact, Alice. And of course, the user is
+communicating over the network, so the only way you have of,
+of authenticating the user is via message. Suppose we authenticated the user. And we know that Alice, is in fact,
+Alice but we we need to check that Alice was trying to access file
+in fact is allowed to access file. Is Alice really authorized
+to access file in the particular mode that
+Alice is attempting to. That is known as authorization,
+that's the second A. The third A is Auditing. And that stands for essentially knowing
+how a particular attack was carried out. So for instance,
+if Eve managed to attack the system and gain access to some data,
+how was that attack carried out? So that we can fix the system for
+the future? Typically, this is done by logging
+all the operations in the system and then later on looking at the logs and
+mining the logs and perhaps replaying the logs and
+figuring out what went wrong. So, how do you design a secure system? Well, essentially it's kind of hard to do
+this because you don't necessarily know how powerful your attacker is. Your attacker may have
+access to data centers. You attacker may have
+the capability to listen, to listen to all the messages that
+are in the underlying network. So when you design a security protocol, first you need to set down on
+paper what your attacker model is. What are your assumptions about
+what your attacker is able to do? For instance, you might assume that
+your attacker is able to read messages that are in the underlying network,
+but is not able to modify messages. A different attacker model
+might involve the attacker also being able to modify the messages. So, what are exactly the assumptions
+that you assume from your attacker? This is very important
+to lay down on paper. Of course, this attacker model should
+be tied to reality which means that you can't just makeup
+an attacker model out of thin air. It needs to actually be an attacker
+model that is somewhat real, that corresponds to real attackers. So once have that accurate model then,
+you have the problem statement and you now, now need to design this security
+mechanisms that satisfy the policy that is specified as a part
+of the problem statement. Then you need to analyze and approve, perhaps formally approve, that
+the mechanisms that you have designed, in fact satisfy the policy under
+the adapted model that you assumed. And this is an important part
+of any secure system design. Finally, when you have
+designed a secure system, you need to analyze the behavior of
+your system when there are no attacks. This is the common case. Attacks do happen, but
+they're not the common case. They happen rarely. And when they're no attacks going on,
+you want your system to be as fast as when the system did not have any
+of your security mechanisms in place. So, analyzing the effect
+of your security mechanisms on the overall performance
+is very important. Typically, when you add security
+mechanisms to an existing system which was insecure to begin with, you're going to
+impact the performance of the system. Perhaps the throughput will go
+down by a few percentage points. If a throughput goes down by say 2 or 3% then that's probably
+acceptable performance overhead. But, if your throughput goes down by 100%
+then, you're in trouble because now, you know, you're incurring a much higher
+cost for the security mechanisms. And that's probably not a good sign
+of security mechanisms anyway. So, in the next lecture we're going to see
+some of the basic cryptography techniques, very basic cryptography techniques. And then,
+after that we'll use cryptography to implement some of the mechanisms
+that we have seen from this lecture. [MUSIC]

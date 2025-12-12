@@ -1,0 +1,78 @@
+[MUSIC] In this lecture we're going to study
+the outage that happened at Facebook a few years ago. So this outage happened on 23rd September, 2010, and during this outage Facebook was
+unreachable for two and a half hours. This was the worst outage in the past four
+years leading up to then at Facebook. Facebook published a post-mortem
+after the outage was resolved and all the information your seeing
+on this particular lecture is from that post-mortem. Once again our goal in studying
+this outage is not to say that Facebook is a bad infrastructure in
+fact it is a very robust infrastructure. And doing the outage Facebook was very
+open and honest with its users about what was going on and after the outage
+Facebook improved the infrastructure and continues to improve its
+infrastructure to avoid such outages. As you know Facebook at, is to be one of the market leaders
+in the area of social networks. So a little bit of background before
+we discuss the actual outage itself. In Facebook, data is stored in
+a persistent store as well as in a cache. Okay?
+So the persistent store has many servers that are essentially
+back-end servers storing the data. And the data includes, you know,
+things like Facebook profiles updates. The status updates that you post. The frame information photographs,
+and so on and so forth. The cache is another set of servers
+that is closer to the clients that is running
+a distributed cache system. So the cache server sit in between the
+persistent store servers in the one end, and the actual client machines,
+the user machines your browser or your mobile device on the other end. This system that includes
+a person in store in cache includes configuration data. And Facebook has an automated system for verifying the configuration
+values in the cache servers. Whenever a particular
+configuration value is invalid the cache server replaces it with updated
+correct values that it fetches from the store from the person
+on the store service. So on September 23rd, Facebook made a change to the persistent
+copy of a particular configuration. Unfortunately, that particular change was
+invalid, because this is where the human operator mistake comes into play that
+triggers this particular outage. When this change, invalid change was made,
+all the clients when I say clients here, I mean Facebook cache servers,
+not your mobile device and your browser. What so, for this you know,
+when I say clients, where this other units say clients,
+I mean Facebook cache servers. When these the client, these Facebook,
+Facebook cache servers, saw this invalid value, all of them
+attended, attended to fix it all at once. All of them queried this cluster
+databases the persistent store to fetch the updated value, and the
+databases were quickly overrun by these hundreds of thousands of queries per
+second coming from these cache servers. Pretty quickly, the team discovered this
+and fixed the invalid configuration, and at this point you might
+start to think well, okay, so now the outage is starting to recover or
+should start to recover. But as we've seen before with outages, they keep cascading because of other
+factors that come into play as well. When a client, meaning the Facebook cache
+server receive an error from a database, it interpreted this as invalid and
+deleted the corresponding cache entry. So essentially when a database failed to
+respond, the client created even more requests to send to the to the database
+layer, to the persistent storage layer. So you can see this bad cascading loop
+happening where the database has an error, the cache service see this error. They try to fetch information from the
+database, but because the database network is overwhelmed by these hundreds
+of thousand of waves per second. The cache server times out and
+panics and it tries to query the database even more aggressively,
+or at least as aggressively as before. And this keeps the network always in
+a bad state and stuck in this bad state. In other words, there is no backup. The cache servers did not slow down
+sending the rate of queries when they saw congestion in the,
+the line from the database itself. Okay, so this rinse-n-repeat cycle
+lead to the cascading failures and the outage kept propagating and
+continuing in this particular case. Facebook solution eventually
+was to realize that they had to turn off
+the entire Facebook website. This stopped all the traffic
+to the database cluster, and the database started to recover. This slowly allowed users back on. This also meant slowly allowing
+the cache servers to come online. And the cache servers slowly
+started to update their caches. This kept the traffic to the database,
+the persistent store layer pretty low. But you know, allowing these cache
+servers on in in stages took awhile and it took until later in the day for
+the entire site to be back up. So what lesson is to be learned from this
+particular outage case study, right? First of all a new configuration
+system design is what Facebook built after this outage, and to avoid exactly
+outages of this kind the second was that, when you cannot access a resource. In this case, the caches unable
+to access the database copy of a configuration value. You should not try aggressively to
+try to access the resource again. Okay, don't try as hard or harder to try to access that
+resource instead backoff which means that wait longer than you waited the last
+time to try to access the resource. So each time a request fails,
+you wait twice as long as last time. That's a potential solution. This is often known as
+exponential backoff. Such an approach is used in networking
+protocols like 802.11 as well as in transport layer protocols
+like TCP to avoid congestion. A similar approach may be
+needed when it comes to data centered layer in terms
+of avoiding such outages. [MUSIC]
